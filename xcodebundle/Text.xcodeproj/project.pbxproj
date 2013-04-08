@@ -25,7 +25,6 @@
 		522C01DC170CB953002C3D79 /* align_right@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01D5170CB953002C3D79 /* align_right@2x.png */; };
 		522C01DD170CB953002C3D79 /* align_top@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01D6170CB953002C3D79 /* align_top@2x.png */; };
 		522C01DE170CB953002C3D79 /* text_field@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01D7170CB953002C3D79 /* text_field@2x.png */; };
-		522C01E0170CBDAB002C3D79 /* EmptyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522C01DF170CBDAB002C3D79 /* EmptyWindow.xib */; };
 		52372E7B170794D800B44F7C /* NewTextWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 52F0EB2A170222CD00E571C7 /* NewTextWindow.xib */; };
 		52F0EB19170220FE00E571C7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52F0EB18170220FE00E571C7 /* Cocoa.framework */; };
 		52F0EB23170220FE00E571C7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 52F0EB21170220FE00E571C7 /* InfoPlist.strings */; };
@@ -50,7 +49,6 @@
 		522C01D5170CB953002C3D79 /* align_right@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "align_right@2x.png"; path = "../Resources/align_right@2x.png"; sourceTree = "<group>"; };
 		522C01D6170CB953002C3D79 /* align_top@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "align_top@2x.png"; path = "../Resources/align_top@2x.png"; sourceTree = "<group>"; };
 		522C01D7170CB953002C3D79 /* text_field@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "text_field@2x.png"; path = "../Resources/text_field@2x.png"; sourceTree = "<group>"; };
-		522C01DF170CBDAB002C3D79 /* EmptyWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EmptyWindow.xib; sourceTree = "<group>"; };
 		52E54E541702407700506A9E /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = Text/Base.xcconfig; sourceTree = "<group>"; };
 		52E54E551702407700506A9E /* Plugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Plugin.xcconfig; path = Text/Plugin.xcconfig; sourceTree = "<group>"; };
 		52E54E561702407700506A9E /* PluginDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = PluginDebug.xcconfig; path = Text/PluginDebug.xcconfig; sourceTree = "<group>"; };
@@ -84,7 +82,6 @@
 			isa = PBXGroup;
 			children = (
 				5227FF9E170B332300501B96 /* TextFieldWindow.xib */,
-				522C01DF170CBDAB002C3D79 /* EmptyWindow.xib */,
 			);
 			name = TextFieldWindow;
 			sourceTree = "<group>";
@@ -256,7 +253,6 @@
 				522C01DC170CB953002C3D79 /* align_right@2x.png in Resources */,
 				522C01DD170CB953002C3D79 /* align_top@2x.png in Resources */,
 				522C01DE170CB953002C3D79 /* text_field@2x.png in Resources */,
-				522C01E0170CBDAB002C3D79 /* EmptyWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

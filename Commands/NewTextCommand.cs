@@ -78,25 +78,37 @@ namespace Text.Commands
       #region Mac Specific UI
       #if ON_OS_MAC
       // Create a NSWindow from a Nib file
-      var window = RhinoMac.Window.FromNib("NewTextWindow", model);
-      // Display the window
-      window.ShowModal();
-      // dialogResult should be null if the window was closed
-      // by clicking on the "X", false if the Cancel was called
-      // and true if OK was called.
-      var dialogResult = window.DialogResult;
-      // Success will be true if the window was closed by the
-      // OK button otherwise it should be false.
-      result = (true == dialogResult ? Result.Success : Result.Cancel);
+      using (var window = RhinoMac.Window.FromNib("NewTextWindow", model))
+      {
+        // Display the window
+        window.ShowModal();
+        // dialogResult should be null if the window was closed
+        // by clicking on the "X", false if the Cancel was called
+        // and true if OK was called.
+        var dialogResult = window.DialogResult;
+        // Success will be true if the window was closed by the
+        // OK button otherwise it should be false.
+        result = (true == dialogResult ? Result.Success : Result.Cancel);
+      }
       #endif
       #endregion
 
-#if ON_OS_WINDOWS
-      var window = new NewTextWindow();
-      window.DataSource = model;
+      #if ON_OS_WINDOWS
+      var window = new WPF.TextWindow();
+      window.DataContext = model;
+      // Need to save the window so it can be used as the
+      // parent for the color dialog.
+      model.Window = window;
+      // Need to set the Rhino main frame window as the parent
+      // for the new window otherwise the window will go behind
+      // the main frame when the Rhino is deactivated then 
+      // activated again.
+      // http://blogs.msdn.com/b/mhendersblog/archive/2005/10/04/476921.aspx
+      var interopHelper = new System.Windows.Interop.WindowInteropHelper(window);
+      interopHelper.Owner = Rhino.RhinoApp.MainWindow().Handle;
       window.ShowDialog();
       result = (true == window.DialogResult ? Result.Success : Result.Cancel);
-#endif
+      #endif
 
       return result;
     }

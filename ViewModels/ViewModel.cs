@@ -87,5 +87,38 @@ namespace Rhino.ViewModel
 
       return memberExpression.Member.Name;
     }
+
+#if ON_OS_MAC
+    public RhinoMac.Window Window { get; set; }
+    /// <summary>
+    /// Called just prior to closing the window.
+    /// </summary>
+    /// <returns><c>true</c>, if the window should close <c>false</c> otherwise.</returns>
+    /// <summary>
+    /// Called just prior to closing the window.
+    /// </summary>
+    /// <returns><c>true</c>, if the window should close <c>false</c> otherwise.</returns>
+    public virtual bool WindowShouldClose()
+    {
+      return true;
+    }
+    /// <summary>
+    /// Called when this window will close.
+    /// </summary>
+    public virtual void WindowWillClose()
+    {
+    }
+    /// <summary>
+    /// Trees the node count.
+    /// </summary>
+    /// <returns>The node count.</returns>
+    /// <param name="name">Name.</param>
+    /// <param name="indexes">Indexes.</param>
+    /// <param name="length">Length.</param>
+    ulong TreeNodeCount(string name, ref ulong[] indexes, ulong length)
+    {
+      return 0L;
+    }
+    #endif
   }
 }

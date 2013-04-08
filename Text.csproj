@@ -14,7 +14,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>..\..\..\Library\Application Support\McNeel\Rhinoceros\MacPlugIns\Text\Text.rhp\Contents\Mono</OutputPath>
+    <OutputPath>..\..\..\..\Library\Application Support\McNeel\Rhinoceros\MacPlugIns\Text\Text.rhp\Contents\Mono</OutputPath>
     <DefineConstants>DEBUG;ON_OS_MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>..\..\..\Library\Application Support\McNeel\Rhinoceros\MacPlugIns\Text\Text.rhp\Contents\Mono</OutputPath>
+    <OutputPath>..\..\..\..\Library\Application Support\McNeel\Rhinoceros\MacPlugIns\Text\Text.rhp\Contents\Mono</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -37,15 +37,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="MonoMac">
-      <HintPath>..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\MonoMac.dll</HintPath>
+      <HintPath>..\..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\MonoMac.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RhinoCommon">
-      <HintPath>..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoCommon.dll</HintPath>
+      <HintPath>..\..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RhinoMac">
-      <HintPath>..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoMac.dll</HintPath>
+      <HintPath>..\..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoMac.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Drawing" />
@@ -55,8 +55,9 @@
     <Compile Include="Commands\NewTextCommand.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Compile Include="TextPlugIn.cs" />
-    <Compile Include="ViewModels\TextViewModel.cs" />
     <Compile Include="ViewModels\TextFieldViewModel.cs" />
+    <Compile Include="ViewModels\TextViewModel.cs" />
+    <Compile Include="RhinoMac\FontManagerController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -65,5 +66,6 @@
   <ItemGroup>
     <Folder Include="ViewModels\" />
     <Folder Include="Commands\" />
+    <Folder Include="RhinoMac\" />
   </ItemGroup>
 </Project>

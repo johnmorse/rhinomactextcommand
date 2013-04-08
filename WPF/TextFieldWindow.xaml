@@ -1,0 +1,268 @@
+﻿<Window x:Class="Text.WPF.TextFieldWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:myWPF="clr-namespace:Text.WPF"
+        Title="Text Field"
+        Height="360"
+        Width="530"
+        MinHeight="360"
+        MinWidth="530"
+        ShowInTaskbar="False"
+        >
+    <Window.Resources>
+        <Style TargetType="Grid" x:Key="TabItemGridStyle">
+            <Setter Property="Margin" Value="6"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="DescriptionTextBlockStyle">
+            <Setter Property="Margin" Value="9,3,3,3"/>
+        </Style>
+        <Style TargetType="GroupBox" x:Key="DescriptionGroupBoxStyle">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="3">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+            <TabControl Margin="3"
+                        TabStripPlacement="Left"
+                        SelectedIndex="{Binding Path=selectedFieldIndex}"
+                        >
+            <TabItem Header="Area">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="BlockInstanceCount">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Block:" Margin="3"/>
+                        <ComboBox Grid.Column="2"
+                                  Margin="3"
+                                  ItemsSource="{Binding Path=blockNameList}"
+                                  SelectedIndex="{Binding Path=selectedBlockNameIndex}"
+                                  >
+                            
+                        </ComboBox>
+                    </Grid>
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="2" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="CurveLength">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Date">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldDateUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="DateModified">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldDateUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="DocumentText">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <ListView Margin="3"
+                              Grid.Row="1"
+                              ItemsSource="{Binding Path=documentTextList}"
+                              >
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Key"
+                                                Width="Auto"
+                                                DisplayMemberBinding="{Binding Path=Key}"
+                                                />
+                                <GridViewColumn Header="Value"
+                                                Width="Auto"
+                                                DisplayMemberBinding="{Binding Path=Value}"
+                                                />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button Grid.Row="2"
+                            Content="+"
+                            Width="24"
+                            HorizontalAlignment="Left"
+                            >
+                    </Button>
+                </Grid>
+            </TabItem>
+            <TabItem Header="FileName">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <CheckBox Content="Include full path"
+                              Grid.Row="1"
+                              IsChecked="{Binding Path=includeFullPath}"
+                              />
+                    <CheckBox Content="Include file extension"
+                              Grid.Row="2"
+                              IsChecked="{Binding Path=includeFileExtension}"
+                              />
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="3" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="ModelUnits">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Notes">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <TextBox Margin="3"
+                             Grid.Row="1"
+                             TextWrapping="Wrap"
+                             IsReadOnly="True"
+                             IsTabStop="False"
+                             Text="{Binding Path=formatString}"
+                             />
+                </Grid>
+            </TabItem>
+            <TabItem Header="NumPages">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="ObjectName">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldSelectObjectUC Grid.Row ="1"  Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="PageName">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="PageNumber">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="UserText">
+                <Grid Style="{StaticResource TabItemGridStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
+                        <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                    </GroupBox>
+                    <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="2" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Help"   Grid.Column="1" Width="80" Margin="3,3,9,3" />
+            <Button Content="OK"     Grid.Column="2" Width="80" Margin="3" Click="ButtonClickOK" />
+            <Button Content="Cancel" Grid.Column="3" Width="80" Margin="3" Click="ButtonClickCancel" />
+        </Grid>
+
+    </Grid>
+</Window>
