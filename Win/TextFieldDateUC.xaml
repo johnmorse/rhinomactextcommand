@@ -15,7 +15,7 @@
                                Margin="3"
                                Padding="0"
                                />
-        <TextBox Grid.Row="1" Margin="3" Text="{Binding Path=formatString}"/>
+        <TextBox Grid.Row="1" Margin="3" IsReadOnly="True" Text="{Binding Path=formatString}"/>
         <ListBox Grid.Row="2"
                                  Margin="3"
                                  ItemsSource="{Binding Path=dateFormatList}"

@@ -10,30 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Text.WPF
 {
   /// <summary>
-  /// Interaction logic for TextFieldWindow.xaml
+  /// Interaction logic for KeyValueListUC.xaml
   /// </summary>
-  public partial class TextFieldWindow : Window
+  public partial class TextFieldKeyValueListUC : UserControl
   {
-    public TextFieldWindow()
+    public TextFieldKeyValueListUC()
     {
       InitializeComponent();
-    }
-
-    private void ButtonClickOK(object sender, RoutedEventArgs e)
-    {
-      DialogResult = true;
-      Close();
-    }
-
-    private void ButtonClickCancel(object sender, RoutedEventArgs e)
-    {
-      DialogResult = false;
-      Close();
     }
   }
 }

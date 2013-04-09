@@ -105,7 +105,7 @@ namespace Text.Commands
       // activated again.
       // http://blogs.msdn.com/b/mhendersblog/archive/2005/10/04/476921.aspx
       var interopHelper = new System.Windows.Interop.WindowInteropHelper(window);
-      interopHelper.Owner = Rhino.RhinoApp.MainWindow().Handle;
+      interopHelper.Owner = Rhino.RhinoApp.MainWindowHandle();
       window.ShowDialog();
       result = (true == window.DialogResult ? Result.Success : Result.Cancel);
       #endif

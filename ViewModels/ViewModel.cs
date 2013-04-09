@@ -120,5 +120,52 @@ namespace Rhino.ViewModel
       return 0L;
     }
     #endif
+
+    #region Invalid value timer methods
+    /// <summary>
+    /// Called to fire property changed notifications from
+    /// within a set method when attempting to set the propert
+    /// to an invalid value.
+    /// </summary>
+    /// <param name="sender">Sender.</param>
+    /// <param name="args">Arguments.</param>
+    void InvalidValueTimerElapsed(object sender, System.Timers.ElapsedEventArgs args)
+    {
+      _invalidValueTimer.Stop();
+      _invalidValueTimer.Enabled = false;
+      var property = _invalidValueProperty;
+      _invalidValueProperty = null;
+      if (!string.IsNullOrWhiteSpace(property))
+        RaisePropertyChanged(property);
+    }
+    /// <summary>
+    /// Start the invalid value timer which will raise
+    /// the appropriate change notification once the
+    /// calling function has a chance to return.
+    /// </summary>
+    /// <param name="propertyExpression">Property expression.</param>
+    /// <typeparam name="T">The 1st type parameter.</typeparam>
+    protected void RaiseInvalidPropertyValue<T>(System.Linq.Expressions.Expression<System.Func<T>> propertyExpression)
+    {
+      if (null == _invalidValueTimer)
+      {
+        // Timer used to raise property changed event when attempting
+        // to set a property to in an invalid value, when the timer
+        // is fired then a RasiePropertyChanged notification is sent
+        // telling the bound control to reset its contents to the
+        // previous value.
+        _invalidValueTimer = new System.Timers.Timer();
+        _invalidValueTimer.Enabled = false;
+        _invalidValueTimer.Interval = 1;
+        _invalidValueTimer.Elapsed += InvalidValueTimerElapsed;
+      }
+      _invalidValueProperty = Rhino.ViewModel.NotificationObject.ExtractPropertyName(propertyExpression);
+      _invalidValueTimer.Enabled = true;
+      _invalidValueTimer.Start();
+    }
+    private System.Timers.Timer _invalidValueTimer;
+    private string _invalidValueProperty = string.Empty;
+    #endregion Invalid value timer methods
+
   }
 }

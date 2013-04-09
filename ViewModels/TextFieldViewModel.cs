@@ -1,11 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Rhino;
 
 namespace Text
 {
+  //////////////////////////////////////////////////////////////////////////////
+  /// <summary>
+  /// Text field Window view model
+  /// </summary>
   class TextFieldViewModel : Rhino.ViewModel.NotificationObject
   {
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="doc"></param>
     public TextFieldViewModel(RhinoDoc doc)
     {
       _doc = doc;
@@ -69,38 +78,82 @@ namespace Text
       _fields.Add("UserText", new TextFieldData(TextFieldType.usertext, name, description));
       #endregion
 
-      // Translate from localized name field name key to key name
+      // Map localized field name to English field name
       foreach (var item in _fields)
         _localizdeFieldNameDictionary.Add(item.Value.LocalName, item.Key);
 
+      // Sort the localized field name list
       string[] keys = new string[_localizdeFieldNameDictionary.Count];
       _localizdeFieldNameDictionary.Keys.CopyTo(keys, 0);
       List<string> sortedList = new List<string>(keys);
       sortedList.Sort((string0, string1) => { return string0.CompareTo(string1); });
       _sortedLocalizedFieldNameList = sortedList.ToArray();
 
+      // Select the first key in the sorted list
       var key = KeyFromLocalizedKey(_sortedLocalizedFieldNameList[0]);
       selectedFieldKey = key;
+
     #if ON_OS_WINDOWS
-      SelectObjectButtonClickedCommand = new Rhino.Windows.Input.DelegateCommand(SelectObjectButtonClicked, null);
+      // Command delegates for WPF
+      SelectObjectButtonClickedCommand = new RhinoWindows.Input.DelegateCommand(SelectObjectButtonClicked, null);
+      AddNameValuePairButtonClickedCommand = new RhinoWindows.Input.DelegateCommand(AddNameValuePairButtonClicked, null);
     #endif
     }
 
     #region Windows specific
     #if ON_OS_WINDOWS
+    /// <summary>
+    /// The main window assoicated with this view model, this is
+    /// used as the owner window when displaying common dialogs
+    /// and child windows.
+    /// </summary>
     public System.Windows.Window Window { get; set; }
+    #region WPF Command delegates
+    /// <summary>
+    /// Command deleate for the "Select Objects" button.
+    /// </summary>
     public System.Windows.Input.ICommand SelectObjectButtonClickedCommand { get; private set; }
+    /// <summary>
+    /// Command delegate for the "+" button located at the bottom
+    /// of the name/value pair lists.
+    /// </summary>
+    public System.Windows.Input.ICommand AddNameValuePairButtonClickedCommand { get; private set; }
+    #endregion WPF Command delegates
+    /// <summary>
+    /// Called when the "Select Objects" button is clicked when
+    /// running in Windows.  Will hid the current Window and 
+    /// prompt the user to select the appropriate object type.
+    /// </summary>
     private void SelectObjectButtonClicked()
     {
-      TextFieldData field;
-      _fields.TryGetValue(selectedFieldKey, out field);
+      var field = SelectedField;
       if (null == field)
         return;
-      //var fieldType = field.Style;
-      //var parent = Rhino.Windows.Forms.WindowsInterop.ObjectAsIWin32Window(Window);
-      //if (fieldType == TextFieldType.area)
-      //  Rhino.UI.Dialogs.PushPickButton(parent, GetObjectForArea);
+      var fieldType = field.Style;
+      if (fieldType == TextFieldType.area)
+        RhinoWindows.RhinoWindow.PushPickButton(Window, GetObjectForArea);
+      else if (fieldType == TextFieldType.curvelength)
+        RhinoWindows.RhinoWindow.PushPickButton(Window, GetObjectForCurveLength);
+      else if (fieldType == TextFieldType.usertext)
+        RhinoWindows.RhinoWindow.PushPickButton(Window, GetObjectForUserText);
+      else if (fieldType == TextFieldType.objectname)
+        RhinoWindows.RhinoWindow.PushPickButton(Window, GetObjectForName);
+
+      if (Doc != null)
+      {
+        Doc.Objects.UnselectAll();
+        Doc.Views.Redraw();
+      }
     }
+    #endif
+    #endregion Windows specific
+
+    #region Select object methods
+    /// <summary>
+    /// Select object for which an area value can be calculated
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void GetObjectForArea(object sender, EventArgs e)
     {
       using (Rhino.Input.Custom.GetObject go = new Rhino.Input.Custom.GetObject())
@@ -123,8 +176,83 @@ namespace Text
         }
       }
     }
-    #endif
-    #endregion Windows specific
+    /// <summary>
+    /// Select a cureve for length calculation
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void GetObjectForCurveLength(object sender, EventArgs e)
+    {
+      using (Rhino.Input.Custom.GetObject go = new Rhino.Input.Custom.GetObject())
+      {
+        go.SetCommandPrompt(Rhino.UI.Localization.LocalizeString("Select curve", 360));
+        go.AcceptNothing(true);
+        go.SubObjectSelect = false;
+        go.GeometryFilter = Rhino.DocObjects.ObjectType.Curve;
+        go.DisablePreSelect();
+        go.Get();
+        if (go.CommandResult() == Rhino.Commands.Result.Success)
+        {
+          Rhino.DocObjects.ObjRef objref = go.Object(0);
+          if (objref != null)
+          {
+            SelectedObjectId = objref.ObjectId;
+            objref.Dispose();
+          }
+        }
+      }
+    }
+    /// <summary>
+    /// Select an object for object name display
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void GetObjectForName(object sender, EventArgs e)
+    {
+      using (Rhino.Input.Custom.GetObject go = new Rhino.Input.Custom.GetObject())
+      {
+        go.SetCommandPrompt(Rhino.UI.Localization.LocalizeString("Select object", 384));
+        go.AcceptNothing(true);
+        go.SubObjectSelect = false;
+        go.DisablePreSelect();
+        go.Get();
+        if (go.CommandResult() == Rhino.Commands.Result.Success)
+        {
+          Rhino.DocObjects.ObjRef objref = go.Object(0);
+          if (objref != null)
+          {
+            SelectedObjectId = objref.ObjectId;
+            objref.Dispose();
+          }
+        }
+      }
+    }
+    /// <summary>
+    /// Select an object which will be used for the user text list
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void GetObjectForUserText(object sender, EventArgs e)
+    {
+      using (Rhino.Input.Custom.GetObject go = new Rhino.Input.Custom.GetObject())
+      {
+        go.SetCommandPrompt(Rhino.UI.Localization.LocalizeString("Select object", 361));
+        go.AcceptNothing(true);
+        go.DisablePreSelect();
+        go.Get();
+        if (go.CommandResult() == Rhino.Commands.Result.Success)
+        {
+          Rhino.DocObjects.ObjRef objref = go.Object(0);
+          if (objref != null)
+          {
+            SelectedObjectId = objref.ObjectId;
+            SetupSelectObjectPanelHelper(TextFieldType.usertext, false);
+            objref.Dispose();
+          }
+        }
+      }
+    }
+    #endregion Select object methods
 
     #region Local methods
     /// <summary>
@@ -132,16 +260,43 @@ namespace Text
     /// </summary>
     /// <returns>The from localized key.</returns>
     /// <param name="key">Key.</param>
-    string KeyFromLocalizedKey(string key)
+    private string KeyFromLocalizedKey(string key)
     {
       string result;
       _localizdeFieldNameDictionary.TryGetValue(key, out result);
       return result;
     }
+    /// <summary>
+    /// Get the field index for the specified English
+    /// field key name.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>
+    /// Returns the dictionary index if the key is found
+    /// otherwise returns -1;
+    /// </returns>
+    private int FieldIndexFromKey(string key)
+    {
+      int i = 0;
+      foreach (var field in _fields)
+      {
+        if (field.Key == key)
+          return i;
+        i++;
+      }
+      return -1;
+    }
     #endregion Local methods
 
     #region Overrides for Mac
     #if ON_OS_MAC
+    /// <summary>
+    /// Check to see if the window should close.
+    /// </summary>
+    /// <returns>
+    /// Return true if it is okay to close the window otherwise
+    /// return false.
+    /// </returns>
     public override bool WindowShouldClose()
     {
       if (null != Window && Window.DialogResult != true || OkayToClose())
@@ -156,21 +311,29 @@ namespace Text
     #endif
     #endregion Overrides for Mac
 
-    #region panel setup helper functions
+    #region Panel setup helper functions
+    /// <summary>
+    /// Called when the current filed changes, will inialize the
+    /// new current page.
+    /// </summary>
+    /// <param name="fieldData">The current field defintion</param>
     private void OnSelectedFieldChanged(TextFieldData fieldData)
     {
       // update description
       var fieldType = TextFieldType.None;
       if (fieldData != null)
       {
+        // Set the field decription display text
         selectedFieldDescription = fieldData.Description;
+        // Extract the field type
         fieldType = fieldData.Style;
       }
       else
       {
+        // Nothing is selected so clear the description text
         selectedFieldDescription = string.Empty;
       }
-      // set up panels based on the text field type
+      // Set up panels based on the text field type
       formatString = string.Empty;
       SetupSelectObjectPanelHelper(fieldType, true);
       SetupSimplePanelHelper(fieldType);
@@ -183,18 +346,20 @@ namespace Text
     {
       if( resetId )
         SelectedObjectId = Guid.Empty;
-      bool showUserText = (fieldType == TextFieldType.usertext && SelectedObjectId != Guid.Empty && Doc != null);
-      if (showUserText)
+      if (fieldType != TextFieldType.usertext) return;
+      showUserTextFieldCollection = (SelectedObjectId != Guid.Empty && Doc != null);
+      _nameValuePairCollection.Clear();
+      selectedNameValuePairIndex = -1;
+      if (showUserTextFieldCollection)
       {
-        Rhino.DocObjects.RhinoObject rhobj = Doc.Objects.Find(SelectedObjectId);
-        if( rhobj!=null )
+        var rhobj = SelectedObject;
+        if (null != rhobj)
         {
-          _userStringList.Clear();
-          System.Collections.Specialized.NameValueCollection userstrings = rhobj.Attributes.GetUserStrings();
+          var userstrings = rhobj.Attributes.GetUserStrings();
           for (int i = 0; i < userstrings.Count; i++)
           {
-            var namevalue = new KeyValuePair<string,string>(userstrings.Keys[i], userstrings[i]);
-            _userStringList.Add(namevalue);
+            var namevalue = new NameValuePair(userstrings.Keys[i], userstrings[i]);
+            _nameValuePairCollection.Add(namevalue);
           }
         }
       }
@@ -289,7 +454,8 @@ namespace Text
     {
       if (fieldType != TextFieldType.documenttext)
         return;
-      _docTextList.Clear();
+      _nameValuePairCollection.Clear();
+      selectedNameValuePairIndex = -1;
       if (Doc != null && Doc.Strings.Count > 0)
       {
         int count = Doc.Strings.Count;
@@ -297,8 +463,8 @@ namespace Text
         {
           var key = Doc.Strings.GetKey(i);
           var value = Doc.Strings.GetValue(i);
-          var item = new DocumentString(key, value);
-          _docTextList.Add(item);
+          var item = new NameValuePair(key, value);
+          _nameValuePairCollection.Add(item);
         }
       }
     }
@@ -324,7 +490,7 @@ namespace Text
         formatString = Rhino.UI.LOC.STR("Selct block to count");
       else if (null == Doc)
         formatString = string.Empty;
-      else if (blockNameList.Length < 1)
+      else if (blockNameList.Count < 1)
         formatString = Rhino.UI.LOC.STR("No blocks to count");
       else
       {
@@ -340,18 +506,81 @@ namespace Text
         }
       }
     }
-    #endregion panel setup helper functions
+    #endregion Panel setup helper functions
+
+    #region Button click methods
+    /// <summary>
+    /// The "+" at the bottom of a name/value pair list was
+    /// clicked so show the add field Window and add the user
+    /// text to the appropriate place.
+    /// </summary>
+    public void AddNameValuePairButtonClicked()
+    {
+      // If there is no document or field selected bail
+      if (Doc == null || SelectedField == null)
+        return;
+      // If the current field is not Document Text or 
+      // object User Text then bail
+      var field = SelectedField;
+      if (field.Style != TextFieldType.documenttext && field.Style != TextFieldType.usertext)
+        return;
+      // If filed type is user string then make sure there is an object
+      // to get/set user strings for
+      Rhino.DocObjects.RhinoObject rhobj = null;
+      if (field.Style == TextFieldType.usertext)
+      {
+        rhobj = SelectedObject;
+        // Can't add a field if we can't find the object
+        if (null == rhobj)
+          return;
+      }
+      // Place holders for new text values
+      var keyText = string.Empty;
+      var valueText = string.Empty;
+      // Display the OS appropriate Window
+#if ON_OS_WINDOWS
+      var window = new WPF.TextFieldAddDocumentTextWindow();
+      window.Owner = Window;
+      window.ShowDialog();
+      if (window.DialogResult == true)
+      {
+        keyText = window.keyText.Text;
+        valueText = window.valueText.Text;
+      }
+#endif
+#if ON_OS_MAC
+#endif
+      // If no new users strings were specified then bail
+      if (string.IsNullOrEmpty(keyText) || string.IsNullOrWhiteSpace(valueText))
+        return;
+      if (field.Style == TextFieldType.documenttext)
+      {
+        // Add or update document user string
+        Doc.Strings.SetString(keyText, valueText);
+        SetupDocTextPanelHelper(TextFieldType.documenttext);
+      }
+      else if (field.Style == TextFieldType.usertext && null != rhobj)
+      {
+        // Add or update object user string
+        rhobj.Attributes.SetUserString(keyText, valueText);
+        rhobj.CommitChanges();
+        SetupSelectObjectPanelHelper(TextFieldType.usertext, false);
+      }
+    }
+    #endregion Button click methods
 
     #region Public methods
-    void SelectAreaObjectButtonClick()
-    {
-      // TODO:
-      // Rhino.UI.Dialogs.PushPickButton(this, GetObjectForArea);
-    }
+    /// <summary>
+    /// Call just prior to closing this Window to determine if
+    /// all appropriate data has been provided.
+    /// </summary>
+    /// <returns>
+    /// If everything needed for the field defintion has been
+    /// provided the return true otherwiwse; return false.
+    /// </returns>
     public bool OkayToClose()
     {
-      TextFieldData fieldData;
-      _fields.TryGetValue(selectedFieldKey, out fieldData);
+      TextFieldData fieldData = SelectedField;
       if (null == fieldData)
         return false;
       bool result = true;
@@ -368,7 +597,7 @@ namespace Text
           }
           break;
         case TextFieldType.blockinstancecount:
-          if (selectedBlockNameIndex < 0 || selectedBlockNameIndex >= blockNameList.Length)
+          if (selectedBlockNameIndex < 0 || selectedBlockNameIndex >= blockNameList.Count)
           {
             selectedFieldDescription = formatString = Rhino.UI.LOC.STR("Must specify a block name first");
           }
@@ -376,10 +605,17 @@ namespace Text
         }
       return result;
     }
+    /// <summary>
+    /// Calculate the format string to add to the text window.
+    /// </summary>
+    /// <returns>
+    /// Returns a properly formatted text field string which
+    /// may be added to the new text dialog or null if the
+    /// format string could not be calculated.
+    /// </returns>
     public string CalculateFinalFormatString()
     {
-      TextFieldData fieldData;
-      _fields.TryGetValue(selectedFieldKey, out fieldData);
+      TextFieldData fieldData = SelectedField;
       if (null == fieldData)
         return string.Empty;
       string result = string.Empty;
@@ -393,7 +629,7 @@ namespace Text
             result = "%<" + fieldData.Style.ToString() + "(\"" + SelectedObjectId.ToString() + "\")>%";
           break;
         case TextFieldType.blockinstancecount:
-          if (selectedBlockNameIndex >= 0 && selectedBlockNameIndex < blockNameList.Length)
+          if (selectedBlockNameIndex >= 0 && selectedBlockNameIndex < blockNameList.Count)
             result = "%<" + fieldData.Style.ToString() + "(\"" + blockNameList[selectedBlockNameIndex] + "\")>%";
           break;
         case TextFieldType.date:
@@ -407,17 +643,13 @@ namespace Text
           }
           break;
         case TextFieldType.documenttext:
-/* TODO:
+          if (null != SelectedNameValuePair)
           {
-            ListView.SelectedListViewItemCollection items = m_list_doctext.SelectedItems;
-            if (items.Count == 1)
-            {
-              string format = items[0].Text;
-              if( !string.IsNullOrEmpty(format) )
-                m_textfield_string = "%<" + fieldData.Style.ToString() + "(\"" + format + "\")>%";
-            }
+            var item = SelectedNameValuePair;
+            string format = item.Name;
+            if (!string.IsNullOrEmpty(format))
+              result = "%<" + fieldData.Style.ToString() + "(\"" + format + "\")>%";
           }
-*/
           break;
         case TextFieldType.filename:
           if (includeFileExtension && includeFullPath)
@@ -440,18 +672,12 @@ namespace Text
           result = "%<" + fieldData.Style.ToString() + ">%";
           break;
         case TextFieldType.usertext:
-/* TODO:
-          if (SelectedObjectId != Guid.Empty)
+          if (SelectedObjectId != Guid.Empty && null != SelectedNameValuePair)
           {
-            ListView.SelectedListViewItemCollection items = m_list_usertext.SelectedItems;
-            if (items.Count == 1)
-            {
-              string format = items[0].Text;
-              if (!string.IsNullOrEmpty(format))
-                m_textfield_string = "%<" + fieldData.Style.ToString() + "(\"" + m_object_id.ToString() + "\",\"" + format + "\")>%";
-            }
+            string format = SelectedNameValuePair.Name;
+            if (!string.IsNullOrEmpty(format))
+              result = "%<" + fieldData.Style.ToString() + "(\"" + SelectedObjectId.ToString() + "\",\"" + format + "\")>%";
           }
-*/
           break;
       }
       return result;
@@ -492,6 +718,9 @@ namespace Text
     {
       get { return _sortedLocalizedFieldNameList; }
     }
+    /// <summary>
+    /// Currently selected English field key name
+    /// </summary>
     public string selectedFieldKey
     {
       get { return _selectedFieldKey; }
@@ -504,11 +733,13 @@ namespace Text
           selectedFieldDescription = _fields[_selectedFieldKey].Description;
         else
           selectedFieldDescription = string.Empty;
-        TextFieldData data;
-        _fields.TryGetValue(selectedFieldKey, out data);
+        TextFieldData data = SelectedField;
         OnSelectedFieldChanged(data);
       }
     }
+    /// <summary>
+    /// Currenly selected field index
+    /// </summary>
     public int selectedFieldIndex
     {
       get { return FieldIndexFromKey(_selectedFieldKey); }
@@ -533,17 +764,21 @@ namespace Text
         RaisePropertyChanged(() => selectedFieldIndex);
       }
     }
-    int FieldIndexFromKey(string key)
+    /// <summary>
+    /// Currently seelcted field record
+    /// </summary>
+    public TextFieldData SelectedField
     {
-      int i = 0;
-      foreach (var field in _fields)
+      get
       {
-        if (field.Key == key)
-          return i;
-        i++;
+        TextFieldData result;
+        _fields.TryGetValue(selectedFieldKey, out result);
+        return result;
       }
-      return -1;
     }
+    /// <summary>
+    /// Currently selected field description display string
+    /// </summary>
     public string selectedFieldDescription
     {
       get { return _selectedFieldDescription; }
@@ -554,6 +789,9 @@ namespace Text
         RaisePropertyChanged(() => selectedFieldDescription);
       }
     }
+    /// <summary>
+    /// Evaluated expression text
+    /// </summary>
     public string formatString
     {
       get
@@ -567,6 +805,9 @@ namespace Text
         RaisePropertyChanged(() => formatString);
       }
     }
+    /// <summary>
+    /// Currently selected date format option
+    /// </summary>
     public int selectedDateFormat
     {
       get { return _selectedDateFormat; }
@@ -578,17 +819,23 @@ namespace Text
         SetupDatePanelHelper(TextFieldType.date);
       }
     }
-    public string[] dateFormatList
+    /// <summary>
+    /// Date format list to be used as list control
+    /// contents.
+    /// </summary>
+    public ObservableCollection<string> dateFormatList
     {
       get
       {
-        var result = new string[_dateFormatList.Count];
-        var i = 0;
+        var result = new ObservableCollection<string>();
         foreach (var item in _dateFormatList)
-          result[i++] = item.ToString();
+          result.Add(item.ToString());
         return result;
       }
     }
+    /// <summary>
+    /// File name option to include file path in output
+    /// </summary>
     public bool includeFullPath
     {
       get
@@ -602,6 +849,9 @@ namespace Text
         SetupFilenamePanelHelper(TextFieldType.filename);
       }
     }
+    /// <summary>
+    /// File name option to include file extension in output
+    /// </summary>
     public bool includeFileExtension
     {
       get {
@@ -614,10 +864,16 @@ namespace Text
         SetupFilenamePanelHelper(TextFieldType.filename);
       }
     }
-    public string[] blockNameList
+    /// <summary>
+    /// Documnets block name list for List Controls
+    /// </summary>
+    public ObservableCollection<string> blockNameList
     {
-      get { return _blockNameList.ToArray(); }
+      get { return _blockNameList; }
     }
+    /// <summary>
+    /// Currently selected block name
+    /// </summary>
     public int selectedBlockNameIndex
     {
       get { return _selectedBlockNameIndex; }
@@ -629,6 +885,9 @@ namespace Text
         SetupCountPanelHelper(TextFieldType.blockinstancecount);
       }
     }
+    /// <summary>
+    /// Selected object Guid
+    /// </summary>
     public Guid SelectedObjectId
     {
       get { return _objectId; }
@@ -639,53 +898,161 @@ namespace Text
           formatString = Rhino.UI.LOC.STR("No object selected");
         else
           formatString = Rhino.UI.LOC.STR("Id = ") + _objectId.ToString();
+        showUserTextFieldCollection = (null != SelectedObject);
       }
     }
-    public List<DocumentString> documentTextList
+    /// <summary>
+    /// The selected object from the current document
+    /// </summary>
+    public Rhino.DocObjects.RhinoObject SelectedObject
     {
       get
       {
-        if (_docTextList.Count < 1)
-        {
-          _docTextList.Add(new DocumentString("Key1", "Value1"));
-          _docTextList.Add(new DocumentString("Key2", "Value2"));
-          _docTextList.Add(new DocumentString("Key3", "Value3"));
-        }
-        return _docTextList;
+        if (null == Doc || SelectedObjectId == Guid.Empty)
+          return null;
+        return Doc.Objects.Find(SelectedObjectId);
       }
     }
-
-    RhinoDoc Doc { get { return _doc; } }
+    /// <summary>
+    /// Name, value collection used for document and 
+    /// object user strings.
+    /// </summary>
+    public ObservableCollection<NameValuePair> nameValuePairCollection
+    {
+      get { return _nameValuePairCollection; }
+      set { }
+    }
+    /// <summary>
+    /// Currently selected user string index
+    /// </summary>
+    public int selectedNameValuePairIndex
+    {
+      get { return _selectedNameValuePair; }
+      set
+      {
+        if (value == _selectedNameValuePair) return;
+        _selectedNameValuePair = value;
+        RaisePropertyChanged(() => selectedNameValuePairIndex);
+      }
+    }
+    /// <summary>
+    /// Currently selected user string record
+    /// </summary>
+    public NameValuePair SelectedNameValuePair
+    {
+      get
+      {
+        if (selectedNameValuePairIndex >= 0 && selectedNameValuePairIndex < _nameValuePairCollection.Count)
+          return _nameValuePairCollection[selectedNameValuePairIndex];
+        return null;
+      }
+    }
+    /// <summary>
+    /// Show user text list control flag
+    /// </summary>
+    public bool showUserTextFieldCollection
+    {
+      get { return _showUserTextFieldCollection; }
+      set
+      {
+        if (_showUserTextFieldCollection == value) return;
+        _showUserTextFieldCollection = value;
+        RaisePropertyChanged(() => showUserTextFieldCollection);
+        RaisePropertyChanged(() => userTextFieldCollectionVisibility);
+      }
+    }
+    public string userTextFieldCollectionVisibility
+    {
+      get { return (showUserTextFieldCollection ? "Visible" : "Hidden"); }
+    }
+    /// <summary>
+    /// Rhino document associated with this view model instance.
+    /// </summary>
+    public RhinoDoc Doc { get { return _doc; } }
     #endregion Public properties
 
     #region Private members
     /// <summary>
-    /// The document used to create the new point
+    /// The document used by this view model instance
     /// </summary>
     private readonly RhinoDoc _doc;
-    private string _selectedFieldKey;
-    private string _selectedFieldDescription = string.Empty;
-    private string _formatString = string.Empty;
-    private readonly Dictionary<string,TextFieldData> _fields = new Dictionary<string,TextFieldData>();
-    private readonly Dictionary<string,string>_localizdeFieldNameDictionary = new Dictionary<string, string>();
+    /// <summary>
+    /// Dictionary of filed defintions
+    /// </summary>
+    private readonly Dictionary<string, TextFieldData> _fields = new Dictionary<string, TextFieldData>();
+    /// <summary>
+    /// Map localized field names to English field names
+    /// </summary>
+    private readonly Dictionary<string, string> _localizdeFieldNameDictionary = new Dictionary<string, string>();
+    /// <summary>
+    /// Sorted, localized field name list
+    /// </summary>
     private readonly string[] _sortedLocalizedFieldNameList;
+    /// <summary>
+    /// Currently selected field
+    /// </summary>
+    private string _selectedFieldKey;
+    /// <summary>
+    /// Currently selected field description
+    /// </summary>
+    private string _selectedFieldDescription = string.Empty;
+    /// <summary>
+    /// Evalued expression string
+    /// </summary>
+    private string _formatString = string.Empty;
+    /// <summary>
+    /// Selected object Id
+    /// </summary>
     private Guid _objectId = Guid.Empty;
-    private List<KeyValuePair<string,string>> _userStringList = new List<KeyValuePair<string,string>>();
+    /// <summary>
+    /// File name option to display full path
+    /// </summary>
     private bool _includeFullPath = true;
+    /// <summary>
+    /// File name option to display file extension
+    /// </summary>
     private bool _includeFileExtension = true;
-    private List<DateFormat> _dateFormatList = new List<DateFormat>();
+    /// <summary>
+    /// Date format list used by current or last save date options
+    /// </summary>
+    private ObservableCollection<DateFormat> _dateFormatList = new ObservableCollection<DateFormat>();
+    /// <summary>
+    /// Currently selected date format
+    /// </summary>
     private int _selectedDateFormat = -1;
-    private List<DocumentString> _docTextList = new List<DocumentString>();
-    private int _selectedDockTextIndex = -1;
-    private List<string> _blockNameList = new List<string>();
+    /// <summary>
+    /// Block name list used when diplaying block counts
+    /// </summary>
+    private ObservableCollection<string> _blockNameList = new ObservableCollection<string>();
+    /// <summary>
+    /// Selected block to count
+    /// </summary>
     private int _selectedBlockNameIndex = -1;
+    /// <summary>
+    /// Colleciton of name value pairs used by document and object user text
+    /// options
+    /// </summary>
+    private ObservableCollection<NameValuePair> _nameValuePairCollection = new ObservableCollection<NameValuePair>();
+    /// <summary>
+    /// Currently selected name value pair
+    /// </summary>
+    private int _selectedNameValuePair = -1;
+    /// <summary>
+    /// If there is an object selected and it can be found then display the
+    /// user text list
+    /// </summary>
+    private bool _showUserTextFieldCollection;
     #endregion Private members
   }
-  class DocumentString
+  //////////////////////////////////////////////////////////////////////////////
+  /// <summary>
+  /// Document or object user string
+  /// </summary>
+  class NameValuePair
   {
     public string Name { get; set; }
     public string Value { get; set; }
-    public DocumentString(string name, string value)
+    public NameValuePair(string name, string value)
     {
       Name = name;
       Value = value;
@@ -693,7 +1060,7 @@ namespace Text
   }
   //////////////////////////////////////////////////////////////////////////////
   /// <summary>
-  /// Date format.
+  /// Date format used by current or last saved date
   /// </summary>
   class DateFormat
   {

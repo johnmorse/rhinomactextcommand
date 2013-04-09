@@ -109,34 +109,11 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
                         <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
                     </GroupBox>
-                    <ListView Margin="3"
-                              Grid.Row="1"
-                              ItemsSource="{Binding Path=documentTextList}"
-                              >
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Key"
-                                                Width="Auto"
-                                                DisplayMemberBinding="{Binding Path=Key}"
-                                                />
-                                <GridViewColumn Header="Value"
-                                                Width="Auto"
-                                                DisplayMemberBinding="{Binding Path=Value}"
-                                                />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                    <Button Grid.Row="2"
-                            Content="+"
-                            Width="24"
-                            HorizontalAlignment="Left"
-                            >
-                    </Button>
+                    <myWPF:TextFieldKeyValueListUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
             <TabItem Header="FileName">
@@ -243,25 +220,48 @@
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <GroupBox Header="Description" Style="{StaticResource DescriptionGroupBoxStyle}">
                         <TextBlock Text="{Binding Path=selectedFieldDescription}" Style="{StaticResource DescriptionTextBlockStyle}"/>
                     </GroupBox>
-                    <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
+                    <Grid Grid.Row="1" Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Select Object"
+                                Padding="6,0"
+                                Margin="3"
+                                HorizontalAlignment="Left"
+                                Width="Auto"
+                                Command="{Binding Path=SelectObjectButtonClickedCommand}"
+                                />
+                        <TextBlock Text="{Binding Path=formatString}"
+                                   Grid.Column="1"
+                                   Margin="3"
+                                   Padding="0"
+                                   />
+                    </Grid>
+                    <myWPF:TextFieldKeyValueListUC Grid.Row ="2"
+                                          Margin="3,0"
+                                          Visibility="{Binding Path=userTextFieldCollectionVisibility}"
+                                          />
                 </Grid>
             </TabItem>
         </TabControl>
         <Grid Grid.Row="2" Margin="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="13*"/>
+                <ColumnDefinition Width="8*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Content="Help"   Grid.Column="1" Width="80" Margin="3,3,9,3" />
-            <Button Content="OK"     Grid.Column="2" Width="80" Margin="3" Click="ButtonClickOK" />
-            <Button Content="Cancel" Grid.Column="3" Width="80" Margin="3" Click="ButtonClickCancel" />
+            <Button Content="Help"   Grid.Column="2" Width="80" Margin="3,3,9,3" />
+            <Button Content="OK"     Grid.Column="3" Width="80" Margin="3" IsDefault="True" Click="ButtonClickOK" />
+            <Button Content="Cancel" Grid.Column="4" Width="80" Margin="3" IsCancel="True"  Click="ButtonClickCancel" />
         </Grid>
 
     </Grid>

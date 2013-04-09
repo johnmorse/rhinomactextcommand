@@ -21,18 +21,10 @@ namespace Text
       _maskTypeList.Add(Rhino.UI.LOC.STR("None"));
       _maskTypeList.Add(Rhino.UI.LOC.STR("Background"));
       _maskTypeList.Add(Rhino.UI.LOC.STR("Solid Color"));
-      // Timer used to raise property changed event when attempting
-      // to set a property to in an invalid value, when the timer
-      // is fired then a RasiePropertyChanged notification is sent
-      // telling the bound control to reset its contents to the
-      // previous value.
-      _invalidValueTimer.Enabled = false;
-      _invalidValueTimer.Interval = 1;
-      _invalidValueTimer.Elapsed += InvalidValueTimerElapsed;
 #if ON_OS_WINDOWS
-      ShowMaskColorDialogCommand = new Rhino.Windows.Input.DelegateCommand(ShowMaskColorDialog, null);
-      ShowSelectTextFontCommand = new Rhino.Windows.Input.DelegateCommand(ShowSelectTextFont, null);
-      ShowTextFieldsFormCommand = new Rhino.Windows.Input.DelegateCommand(ShowTextFieldsForm, null);
+      ShowMaskColorDialogCommand = new RhinoWindows.Input.DelegateCommand(ShowMaskColorDialog, null);
+      ShowSelectTextFontCommand = new RhinoWindows.Input.DelegateCommand(ShowSelectTextFont, null);
+      ShowTextFieldsFormCommand = new RhinoWindows.Input.DelegateCommand(ShowTextFieldsForm, null);
 #endif
     }
 
@@ -74,38 +66,6 @@ namespace Text
     #endif
     #endregion Mac Specific
 
-    #region Invalid value timer methods
-    /// <summary>
-    /// Called to fire property changed notifications from
-    /// within a set method when attempting to set the propert
-    /// to an invalid value.
-    /// </summary>
-    /// <param name="sender">Sender.</param>
-    /// <param name="args">Arguments.</param>
-    void InvalidValueTimerElapsed(object sender, System.Timers.ElapsedEventArgs args)
-    {
-      _invalidValueTimer.Stop();
-      _invalidValueTimer.Enabled = false;
-      var property = _invalidValueProperty;
-      _invalidValueProperty = null;
-      if (!string.IsNullOrWhiteSpace(property))
-        RaisePropertyChanged(property);
-    }
-    /// <summary>
-    /// Start the invalid value timer which will raise
-    /// the appropriate change notification once the
-    /// calling function has a chance to return.
-    /// </summary>
-    /// <param name="propertyExpression">Property expression.</param>
-    /// <typeparam name="T">The 1st type parameter.</typeparam>
-    void RaiseInvalidPropertyValue<T>(System.Linq.Expressions.Expression<System.Func<T>> propertyExpression)
-    {
-      _invalidValueProperty = Rhino.ViewModel.NotificationObject.ExtractPropertyName(propertyExpression);
-      _invalidValueTimer.Enabled = true;
-      _invalidValueTimer.Start();
-    }
-    #endregion Invalid value timer methods
-
     #region Methods
     /// <summary>
     /// Adds the text entity to document.
@@ -132,43 +92,77 @@ namespace Text
       var fontDialog = new System.Windows.Forms.FontDialog();
       var font = new System.Drawing.Font(fontFaceName, 12f);
       fontDialog.Font = font;
-      var parent = Rhino.Windows.Forms.WindowsInterop.ObjectAsIWin32Window(Window);
+      var parent = RhinoWindows.Forms.WindowsInterop.ObjectAsIWin32Window(Window);
       if (null == parent) parent = RhinoApp.MainWindow();
       if (System.Windows.Forms.DialogResult.OK == fontDialog.ShowDialog(parent))
         fontFaceName = fontDialog.Font.FontFamily.Name;
     #endif
     }
+    /// <summary>
+    /// Show the color dialog and change the mask color if necessary.  This
+    /// only works on Windows, Mac has a ColorShade control to handle display
+    /// of the color dialog.
+    /// </summary>
     public void ShowMaskColorDialog()
     {
     #if ON_OS_WINDOWS
       var color = new Rhino.Display.Color4f(maskColor);
-      var parent = Rhino.Windows.Forms.WindowsInterop.ObjectAsIWin32Window(Window);
+      var parent = RhinoWindows.Forms.WindowsInterop.ObjectAsIWin32Window(Window);
       if (null == parent) parent = RhinoApp.MainWindow();
       if (Rhino.UI.Dialogs.ShowColorDialog(parent, ref color, false))
         maskColor = color.AsSystemColor();
     #endif
     }
     /// <summary>
-    /// Shows the text fields form.
+    /// Shows the text fields form
     /// </summary>
     public void ShowTextFieldsForm()
     {
       // View model to be used as the controller for the text
       // field window.
       var viewModel = new TextFieldViewModel(Doc);
+      bool? dialogResult = null;
+      var start = -1;
+      var length = -1;
     #if ON_OS_MAC
       // Create a NSWindow from a Nib file
       var window = RhinoMac.Window.FromNib("TextFieldWindow", viewModel);
       // Display the window
       window.ShowModal();
+      dialogResult = window.DialogResult;
     #endif
-#if ON_OS_WINDOWS
+    #if ON_OS_WINDOWS
+      var textWindow = Window as WPF.TextWindow;
+      if (null != textWindow)
+      {
+        // Need to update the text property, it wont get updated when the
+        // fields button gets clicked so do it manually
+        text = textWindow.textBox.Text;
+        // Get the location of the cursor in the text box
+        start = textWindow.textBox.SelectionStart;
+        // Get the slected text length if something is selected
+        length = textWindow.textBox.SelectionLength;
+      }
       var window = new WPF.TextFieldWindow();
       window.DataContext = viewModel;
       window.Owner = Window;
       viewModel.Window = window;
       window.ShowDialog();
-#endif
+      dialogResult = window.DialogResult;
+    #endif
+      if (dialogResult != true)
+        return;
+      var formatString = viewModel.CalculateFinalFormatString();
+      if (string.IsNullOrEmpty(formatString))
+        return;
+      if (!string.IsNullOrEmpty(text) && start >= 0 && length >= 0)
+      {
+        var before = (start < 1 ? string.Empty : text.Substring(0, start));
+        var after = ((start + length) < text.Length) ? text.Substring(start + length) : string.Empty;
+        text = before + formatString + after;
+      }
+      else
+        text += formatString;
     }
     #endregion Methods
 
@@ -270,10 +264,18 @@ namespace Text
         RaisePropertyChanged(() => fontFaceName);
       }
     }
+    /// <summary>
+    /// Used by WPF to set the bold font property for the preview and input
+    /// TextBoxes
+    /// </summary>
     public string FontWeight
     {
       get { return (bold ? "Bold" : "Normal"); }
     }
+    /// <summary>
+    /// Used by WPF to set the italic font property for the preview and input
+    /// TextBoxes
+    /// </summary>
     public string FontStyle
     {
       get { return (italic ? "Italic" : "Normal"); }
@@ -578,8 +580,6 @@ namespace Text
     /// </summary>
     private readonly RhinoDoc _doc;
     private Rhino.Geometry.TextEntity _textEntity;
-    private System.Timers.Timer _invalidValueTimer = new System.Timers.Timer();
-    private string _invalidValueProperty = string.Empty;
     private List<string> _maskTypeList = new List<string>();
     #endregion Private members
   }
