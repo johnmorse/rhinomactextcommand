@@ -539,7 +539,7 @@ namespace Text
       var valueText = string.Empty;
       // Display the OS appropriate Window
 #if ON_OS_WINDOWS
-      var window = new WPF.TextFieldAddDocumentTextWindow();
+      var window = new Win.TextFieldAddDocumentTextWindow();
       window.Owner = Window;
       window.ShowDialog();
       if (window.DialogResult == true)

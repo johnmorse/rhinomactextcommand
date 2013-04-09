@@ -94,7 +94,7 @@ namespace Text.Commands
       #endregion
 
       #if ON_OS_WINDOWS
-      var window = new WPF.TextWindow();
+      var window = new Win.TextWindow();
       window.DataContext = model;
       // Need to save the window so it can be used as the
       // parent for the color dialog.

@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Text.WPF
+namespace Text.Win
 {
   /// <summary>
   /// Interaction logic for TextWindow.xaml

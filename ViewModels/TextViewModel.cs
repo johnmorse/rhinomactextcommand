@@ -132,7 +132,7 @@ namespace Text
       dialogResult = window.DialogResult;
     #endif
     #if ON_OS_WINDOWS
-      var textWindow = Window as WPF.TextWindow;
+      var textWindow = Window as Win.TextWindow;
       if (null != textWindow)
       {
         // Need to update the text property, it wont get updated when the
@@ -143,7 +143,7 @@ namespace Text
         // Get the slected text length if something is selected
         length = textWindow.textBox.SelectionLength;
       }
-      var window = new WPF.TextFieldWindow();
+      var window = new Win.TextFieldWindow();
       window.DataContext = viewModel;
       window.Owner = Window;
       viewModel.Window = window;

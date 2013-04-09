@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Text.WPF
+namespace Text.Win
 {
   /// <summary>
   /// Interaction logic for TextFieldDateUC.xaml

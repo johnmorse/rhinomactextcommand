@@ -1,4 +1,4 @@
-﻿<Window x:Class="Text.WPF.TextWindow"
+﻿<Window x:Class="Text.Win.TextWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:libconvert="clr-namespace:RhinoWindows.Converters;assembly=RhinoWindows"
