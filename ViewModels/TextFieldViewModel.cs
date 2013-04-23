@@ -9,7 +9,7 @@ namespace Text
   /// <summary>
   /// Text field Window view model
   /// </summary>
-  class TextFieldViewModel : Rhino.ViewModel.NotificationObject
+  class TextFieldViewModel : Rhino.ViewModel.NotificationObject, IDisposable
   {
     /// <summary>
     /// Constructor
@@ -99,6 +99,57 @@ namespace Text
       AddNameValuePairButtonClickedCommand = new RhinoWindows.Input.DelegateCommand(AddNameValuePairButtonClicked, null);
     #endif
     }
+
+    public void Dispose()
+    {
+    #if ON_OS_MAC
+      if (null != _fieldNameArray)
+        _fieldNameArray.Dispose();
+      _fieldNameArray = null;
+      if (null != _selectedFieldIndexArray)
+        _selectedFieldIndexArray.Dispose();
+      _selectedFieldIndexArray = null;
+      if (null != _nameValuePairCollectionArray)
+        _nameValuePairCollectionArray.Dispose();
+      _nameValuePairCollectionArray = null;
+      if (null != _selectedNameValuePairArrayIndex)
+        _selectedNameValuePairArrayIndex.Dispose();
+      _selectedNameValuePairArrayIndex = null;
+      if (null != _selectedDateFormatArrayIndex)
+        _selectedDateFormatArrayIndex.Dispose();
+      _selectedDateFormatArrayIndex = null;
+    #endif
+    }
+
+    #region Mac specific
+    #if ON_OS_MAC
+    /// <summary>
+    /// Called when the "Select Objects" button is clicked when
+    /// running in Windows.  Will hid the current Window and 
+    /// prompt the user to select the appropriate object type.
+    /// </summary>
+    public void SelectObjectButtonClicked()
+    {
+      var field = SelectedField;
+      if (null == field)
+        return;
+      var fieldType = field.Style;
+      if (fieldType == TextFieldType.area)
+        Window.PushPickButton(Window, GetObjectForArea);
+      else if (fieldType == TextFieldType.curvelength)
+        Window.PushPickButton(Window, GetObjectForCurveLength);
+      else if (fieldType == TextFieldType.usertext)
+        Window.PushPickButton(Window, GetObjectForUserText);
+      else if (fieldType == TextFieldType.objectname)
+        Window.PushPickButton(Window, GetObjectForName);
+      if (Doc != null)
+      {
+        Doc.Objects.UnselectAll();
+        Doc.Views.Redraw();
+      }
+    }
+    #endif
+    #endregion
 
     #region Windows specific
     #if ON_OS_WINDOWS
@@ -347,22 +398,26 @@ namespace Text
       if( resetId )
         SelectedObjectId = Guid.Empty;
       if (fieldType != TextFieldType.usertext) return;
-      showUserTextFieldCollection = (SelectedObjectId != Guid.Empty && Doc != null);
+      hideUserTextFieldCollection = (SelectedObjectId == Guid.Empty || Doc == null);
       _nameValuePairCollection.Clear();
       selectedNameValuePairIndex = -1;
-      if (showUserTextFieldCollection)
+      if (!hideUserTextFieldCollection)
       {
         var rhobj = SelectedObject;
         if (null != rhobj)
         {
           var userstrings = rhobj.Attributes.GetUserStrings();
+          var keys = userstrings.Keys;
           for (int i = 0; i < userstrings.Count; i++)
           {
-            var namevalue = new NameValuePair(userstrings.Keys[i], userstrings[i]);
+            var namevalue = new NameValuePair(keys[i], userstrings[i]);
             _nameValuePairCollection.Add(namevalue);
           }
         }
       }
+      #if ON_OS_MAC
+      RaisePropertyChanged(() => nameValuePairCollectionArray);
+      #endif
     }
     private void SetupSimplePanelHelper(TextFieldType fieldType)
     {
@@ -444,6 +499,9 @@ namespace Text
         _dateFormatList.Add(new DateFormat("HH:mm", dt));
         _dateFormatList.Add(new DateFormat("HH:mm:ss", dt));
         RaisePropertyChanged(() => dateFormatList);
+      #if ON_OS_MAC
+        RaisePropertyChanged(() => dateFormatArray);
+      #endif
       }
       if (selectedDateFormat >= 0 && selectedDateFormat < _dateFormatList.Count)
         formatString = _dateFormatList[selectedDateFormat].Format;
@@ -467,6 +525,9 @@ namespace Text
           _nameValuePairCollection.Add(item);
         }
       }
+    #if ON_OS_MAC
+      RaisePropertyChanged(() => nameValuePairCollectionArray);
+    #endif
     }
     private void SetupCountPanelHelper(TextFieldType fieldType)
     {
@@ -549,9 +610,19 @@ namespace Text
       }
 #endif
 #if ON_OS_MAC
+      var model = new AddUserTextWindowViewModel();
+      using (var window = RhinoMac.Window.FromNib("AddUserTextWindow", model))
+      {
+        window.ShowModal();
+        if (window.DialogResult == true)
+        {
+          keyText = model.fieldName;
+          valueText = model.fieldValue;
+        }
+      }
 #endif
       // If no new users strings were specified then bail
-      if (string.IsNullOrEmpty(keyText) || string.IsNullOrWhiteSpace(valueText))
+      if (string.IsNullOrEmpty(keyText) || string.IsNullOrEmpty(valueText))
         return;
       if (field.Style == TextFieldType.documenttext)
       {
@@ -684,30 +755,143 @@ namespace Text
     }
     #endregion
 
-    #region GetPoint helpers
-    public void GetObjectForArea()
+    #region Mac specific array and selection
+    #if ON_OS_MAC
+    /// <summary>
+    /// Gets a Monmac NsArray of NsObject's for use in table view data
+    /// binding.
+    /// </summary>
+    /// <value>The field name array.</value>
+    public MonoMac.Foundation.NSArray fieldNameArray
     {
-      using(Rhino.Input.Custom.GetObject go = new Rhino.Input.Custom.GetObject())
+      get
       {
-        go.SetCommandPrompt(Rhino.UI.LOC.STR("Select closed curve, hatch, surface, or mesh"));
-        go.AcceptNothing(true);
-        go.SubObjectSelect = false;
-        go.GeometryFilter = Rhino.DocObjects.ObjectType.Curve | Rhino.DocObjects.ObjectType.Hatch | Rhino.DocObjects.ObjectType.Surface | Rhino.DocObjects.ObjectType.Brep | Rhino.DocObjects.ObjectType.Mesh;
-        go.GeometryAttributeFilter = Rhino.Input.Custom.GeometryAttributeFilter.ClosedCurve;
-        go.DisablePreSelect();
-        go.Get();
-        if( go.CommandResult()== Rhino.Commands.Result.Success )
-        {
-          Rhino.DocObjects.ObjRef objref = go.Object(0);
-          if( objref!=null )
-          {
-            SelectedObjectId = objref.ObjectId;
-            objref.Dispose();
-          }
-        }
+        var nsfields = new List<MonoMac.Foundation.NSObject>(_fields.Count);
+        foreach (var field in _sortedLocalizedFieldNameList)
+          nsfields.Add(_fields[KeyFromLocalizedKey(field)]);
+        _fieldNameArray = MonoMac.Foundation.NSArray.FromNSObjects(nsfields.ToArray());
+        foreach (var field in nsfields)
+          field.Dispose();
+        return _fieldNameArray;
       }
     }
-    #endregion GetPoint helpers
+    MonoMac.Foundation.NSArray _fieldNameArray;
+    /// <summary>
+    /// NSMutableIndexSet which constrols selection, used to bind to
+    /// the NsArrayController which is bound to a table view.
+    /// </summary>
+    /// <value>The selected field index array.</value>
+    public MonoMac.Foundation.NSMutableIndexSet selectedFieldIndexArray
+    {
+      get
+      {
+        if (null == _selectedFieldIndexArray)
+          _selectedFieldIndexArray = new MonoMac.Foundation.NSMutableIndexSet();
+        else
+          _selectedFieldIndexArray.Clear();
+        var index = selectedFieldIndex;
+        if (index >= 0)
+          _selectedFieldIndexArray.Add((ulong)index);
+        return _selectedFieldIndexArray;
+      }
+      set
+      {
+        int index = (null != value && value.Count == 1) ? (int)value.FirstIndex : -1;
+        if (selectedFieldIndex == index) return;
+        selectedFieldIndex = index;
+        RaisePropertyChanged(() => selectedFieldIndexArray);
+      }
+    }
+    MonoMac.Foundation.NSMutableIndexSet _selectedFieldIndexArray;
+    /// <summary>
+    /// Gets the name value pair collection as a NSArray value which may
+    /// be bound to an ArrayController on the Mac
+    /// </summary>
+    /// <value>The name value pair collection array.</value>
+    public MonoMac.Foundation.NSArray nameValuePairCollectionArray
+    {
+      get
+      {
+        if (null != _nameValuePairCollectionArray)
+        {
+          _nameValuePairCollectionArray.Dispose();
+          _nameValuePairCollectionArray = null;
+        }
+        var nsfields = new List<MonoMac.Foundation.NSObject>(_nameValuePairCollection.Count);
+        foreach (var field in _nameValuePairCollection)
+          nsfields.Add(field);
+        _nameValuePairCollectionArray = MonoMac.Foundation.NSArray.FromNSObjects(nsfields.ToArray());
+        return _nameValuePairCollectionArray;
+      }
+    }
+    MonoMac.Foundation.NSArray _nameValuePairCollectionArray;
+    /// <summary>
+    /// Get or set the currently selected item in the NSArray controller
+    /// </summary>
+    /// <value>The index of the selected name value pair array.</value>
+    public MonoMac.Foundation.NSMutableIndexSet selectedNameValuePairArrayIndex
+    {
+      get
+      {
+        if (null == _selectedNameValuePairArrayIndex)
+          _selectedNameValuePairArrayIndex = new MonoMac.Foundation.NSMutableIndexSet();
+        else
+          _selectedNameValuePairArrayIndex.Clear();
+        var index = selectedNameValuePairIndex;
+        if (index >= 0)
+          _selectedNameValuePairArrayIndex.Add((ulong)index);
+        return _selectedNameValuePairArrayIndex;
+      }
+      set
+      {
+        int index = (null != value && value.Count == 1) ? (int)value.FirstIndex : -1;
+        if (selectedNameValuePairIndex == index) return;
+        selectedNameValuePairIndex = index;
+        RaisePropertyChanged(() => selectedNameValuePairArrayIndex);
+      }
+    }
+    MonoMac.Foundation.NSMutableIndexSet _selectedNameValuePairArrayIndex;
+    public MonoMac.Foundation.NSArray dateFormatArray
+    {
+      get
+      {
+        if (null != _dateFormatArray)
+        {
+          _dateFormatArray.Dispose();
+          _dateFormatArray = null;
+        }
+        var nsfields = new List<MonoMac.Foundation.NSObject>(_dateFormatList.Count);
+        foreach (var field in _dateFormatList)
+          nsfields.Add(field);
+        _dateFormatArray = MonoMac.Foundation.NSArray.FromNSObjects(nsfields.ToArray());
+        return _dateFormatArray;
+      }
+    }
+    MonoMac.Foundation.NSArray _dateFormatArray;
+    public MonoMac.Foundation.NSIndexSet selectedDateFormatArrayIndex
+    {
+      get
+      {
+        if (null != _selectedDateFormatArrayIndex)
+          _selectedDateFormatArrayIndex.Dispose();
+        var index = selectedDateFormat;
+        if (index < 0)
+          _selectedDateFormatArrayIndex = new MonoMac.Foundation.NSIndexSet();
+        else
+          _selectedDateFormatArrayIndex = MonoMac.Foundation.NSIndexSet.FromIndex((ulong)index);
+        return _selectedDateFormatArrayIndex;
+      }
+      set
+      {
+        int index = (null != value && value.Count == 1) ? (int)value.FirstIndex : -1;
+        if (selectedDateFormat == index) return;
+        selectedDateFormat = index;
+        RaisePropertyChanged(() => selectedDateFormatArrayIndex);
+      }
+    }
+    MonoMac.Foundation.NSIndexSet _selectedDateFormatArrayIndex;
+    #endif
+    #endregion Mac specific array and selection
 
     #region Public properties
     /// <summary>
@@ -867,9 +1051,32 @@ namespace Text
     /// <summary>
     /// Documnets block name list for List Controls
     /// </summary>
-    public ObservableCollection<string> blockNameList
+    public List<string> blockNameList
     {
       get { return _blockNameList; }
+    }
+    /// <summary>
+    /// Could not figure out how to bind selected index on the mac to a combo
+    /// box whoes content is a list of strings, it seems to want the string
+    /// that is in the combo box so this looks up string and sets/gets the
+    /// index accordingly.
+    /// </summary>
+    /// <value>The name of the selected block.</value>
+    public string selectedBlockName
+    {
+      get
+      {
+        if (selectedBlockNameIndex < 0 || selectedBlockNameIndex >= _blockNameList.Count)
+          return string.Empty;
+        return _blockNameList[selectedBlockNameIndex];
+      }
+      set
+      {
+        var index = string.IsNullOrEmpty(value) ? -1 : _blockNameList.IndexOf(value);
+        if (index == selectedBlockNameIndex) return;
+        RaisePropertyChanged(() => selectedBlockName);
+        selectedBlockNameIndex = index;
+      }
     }
     /// <summary>
     /// Currently selected block name
@@ -898,7 +1105,7 @@ namespace Text
           formatString = Rhino.UI.LOC.STR("No object selected");
         else
           formatString = Rhino.UI.LOC.STR("Id = ") + _objectId.ToString();
-        showUserTextFieldCollection = (null != SelectedObject);
+        hideUserTextFieldCollection = (null == SelectedObject);
       }
     }
     /// <summary>
@@ -947,23 +1154,33 @@ namespace Text
         return null;
       }
     }
-    /// <summary>
-    /// Show user text list control flag
-    /// </summary>
-    public bool showUserTextFieldCollection
+    public bool enableUserTextFieldCollection
     {
-      get { return _showUserTextFieldCollection; }
+      get { return (!hideUserTextFieldCollection); }
+      set { hideUserTextFieldCollection = !value; }
+    }
+    /// <summary>
+    /// Hide user text list control flag
+    /// </summary>
+    public bool hideUserTextFieldCollection
+    {
+      get { return _hideUserTextFieldCollection; }
       set
       {
-        if (_showUserTextFieldCollection == value) return;
-        _showUserTextFieldCollection = value;
-        RaisePropertyChanged(() => showUserTextFieldCollection);
+        if (_hideUserTextFieldCollection == value) return;
+        _hideUserTextFieldCollection = value;
+        RaisePropertyChanged(() => hideUserTextFieldCollection);
         RaisePropertyChanged(() => userTextFieldCollectionVisibility);
+        RaisePropertyChanged(() => enableUserTextFieldCollection);
       }
     }
+    /// <summary>
+    /// Used by WPF Visible property
+    /// </summary>
+    /// <value>The user text field collection visibility.</value>
     public string userTextFieldCollectionVisibility
     {
-      get { return (showUserTextFieldCollection ? "Visible" : "Hidden"); }
+      get { return (hideUserTextFieldCollection ? "Hidden" : "Visible"); }
     }
     /// <summary>
     /// Rhino document associated with this view model instance.
@@ -1023,7 +1240,7 @@ namespace Text
     /// <summary>
     /// Block name list used when diplaying block counts
     /// </summary>
-    private ObservableCollection<string> _blockNameList = new ObservableCollection<string>();
+    private List<string> _blockNameList = new List<string>();
     /// <summary>
     /// Selected block to count
     /// </summary>
@@ -1039,18 +1256,57 @@ namespace Text
     private int _selectedNameValuePair = -1;
     /// <summary>
     /// If there is an object selected and it can be found then display the
-    /// user text list
+    /// user text list otherwise hide it
     /// </summary>
-    private bool _showUserTextFieldCollection;
+    private bool _hideUserTextFieldCollection;
     #endregion Private members
+  }
+  //////////////////////////////////////////////////////////////////////////////
+  /// <summary>
+  /// Add user text window view model.
+  /// </summary>
+  class AddUserTextWindowViewModel : Rhino.ViewModel.NotificationObject
+  {
+    public string fieldName
+    {
+      get { return _fieldName; }
+      set
+      {
+        if (value == _fieldName) return;
+        _fieldName = value;
+        RaisePropertyChanged(() => fieldName);
+      }
+    }
+    public string fieldValue
+    {
+      get { return _fieldValue; }
+      set
+      {
+        if (value == _fieldValue) return;
+        _fieldValue = value;
+        RaisePropertyChanged(() => fieldValue);
+      }
+    }
+    private string _fieldName = string.Empty;
+    private string _fieldValue = string.Empty;
   }
   //////////////////////////////////////////////////////////////////////////////
   /// <summary>
   /// Document or object user string
   /// </summary>
+#if ON_OS_MAC
+  class NameValuePair : MonoMac.Foundation.NSObject
+#else
   class NameValuePair
+#endif 
   {
+    #if ON_OS_MAC
+    [MonoMac.Foundation.Export ("fieldName")]
+    #endif
     public string Name { get; set; }
+    #if ON_OS_MAC
+    [MonoMac.Foundation.Export ("fieldValue")]
+    #endif
     public string Value { get; set; }
     public NameValuePair(string name, string value)
     {
@@ -1062,7 +1318,11 @@ namespace Text
   /// <summary>
   /// Date format used by current or last saved date
   /// </summary>
+#if ON_OS_MAC
+  class DateFormat : MonoMac.Foundation.NSObject
+#else
   class DateFormat
+#endif
   {
     DateTime m_date;
     readonly string m_format;
@@ -1075,6 +1335,16 @@ namespace Text
     {
       return m_date.ToString(m_format);
     }
+    #if ON_OS_MAC
+    [MonoMac.Foundation.Export ("listString")]
+    #endif
+    public string ListString
+    {
+      get { return ToString(); }
+    }
+    #if ON_OS_MAC
+    [MonoMac.Foundation.Export ("format")]
+    #endif
     public string Format
     {
       get { return m_format; }
@@ -1106,7 +1376,11 @@ namespace Text
   /// <summary>
   /// Text field data.
   /// </summary>
+#if ON_OS_MAC
+  class TextFieldData : MonoMac.Foundation.NSObject
+#else
   class TextFieldData
+#endif
   {
     readonly TextFieldType m_style;
     readonly string m_local_name;
@@ -1119,8 +1393,11 @@ namespace Text
     }
     public TextFieldType Style { get { return m_style; } }
     public string EnglishName { get { return m_style.ToString(); } }
+#if ON_OS_MAC
+    [MonoMac.Foundation.Export ("localName")]
+#endif
     public string LocalName { get { return m_local_name; } }
-    public string Description { get { return m_description; } }
+    public override string Description { get { return m_description; } }
     public override string ToString()
     {
       return LocalName;

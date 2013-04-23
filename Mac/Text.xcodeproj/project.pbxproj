@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5227FF9F170B332300501B96 /* TextFieldWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5227FF9E170B332300501B96 /* TextFieldWindow.xib */; };
 		522C01C6170CACE2002C3D79 /* align_bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01BD170CACE2002C3D79 /* align_bottom.png */; };
 		522C01C7170CACE2002C3D79 /* align_center.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01BE170CACE2002C3D79 /* align_center.png */; };
 		522C01C8170CACE2002C3D79 /* align_left.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01BF170CACE2002C3D79 /* align_left.png */; };
@@ -26,6 +25,10 @@
 		522C01DD170CB953002C3D79 /* align_top@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01D6170CB953002C3D79 /* align_top@2x.png */; };
 		522C01DE170CB953002C3D79 /* text_field@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522C01D7170CB953002C3D79 /* text_field@2x.png */; };
 		52372E7B170794D800B44F7C /* NewTextWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 52F0EB2A170222CD00E571C7 /* NewTextWindow.xib */; };
+		52DAD2D017170AB00037C622 /* TextFieldWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5227FF9E170B332300501B96 /* TextFieldWindow.xib */; };
+		52EA58181715BDFC005C8CCF /* AddUserTextWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 52EA58171715BDFC005C8CCF /* AddUserTextWindow.xib */; };
+		52EA581B1715C309005C8CCF /* add_item.png in Resources */ = {isa = PBXBuildFile; fileRef = 52EA58191715C309005C8CCF /* add_item.png */; };
+		52EA581C1715C309005C8CCF /* add_item@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52EA581A1715C309005C8CCF /* add_item@2x.png */; };
 		52F0EB19170220FE00E571C7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52F0EB18170220FE00E571C7 /* Cocoa.framework */; };
 		52F0EB23170220FE00E571C7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 52F0EB21170220FE00E571C7 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
@@ -55,6 +58,9 @@
 		52E54E571702407700506A9E /* PluginRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = PluginRelease.xcconfig; path = Text/PluginRelease.xcconfig; sourceTree = "<group>"; };
 		52E54E581702407700506A9E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Text/Release.xcconfig; sourceTree = "<group>"; };
 		52E54E59170240D600506A9E /* MacOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = MacOS.xcconfig; path = Text/MacOS.xcconfig; sourceTree = "<group>"; };
+		52EA58171715BDFC005C8CCF /* AddUserTextWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddUserTextWindow.xib; sourceTree = "<group>"; };
+		52EA58191715C309005C8CCF /* add_item.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_item.png; path = ../Resources/add_item.png; sourceTree = "<group>"; };
+		52EA581A1715C309005C8CCF /* add_item@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "add_item@2x.png"; path = "../Resources/add_item@2x.png"; sourceTree = "<group>"; };
 		52F0EB15170220FE00E571C7 /* Text.rhp */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Text.rhp; sourceTree = BUILT_PRODUCTS_DIR; };
 		52F0EB18170220FE00E571C7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		52F0EB1B170220FE00E571C7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -81,6 +87,7 @@
 		5227FF9D170B32FB00501B96 /* TextFieldWindow */ = {
 			isa = PBXGroup;
 			children = (
+				52EA58171715BDFC005C8CCF /* AddUserTextWindow.xib */,
 				5227FF9E170B332300501B96 /* TextFieldWindow.xib */,
 			);
 			name = TextFieldWindow;
@@ -89,6 +96,8 @@
 		522C01BC170CAC9E002C3D79 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				52EA58191715C309005C8CCF /* add_item.png */,
+				52EA581A1715C309005C8CCF /* add_item@2x.png */,
 				522C01D1170CB953002C3D79 /* align_bottom@2x.png */,
 				522C01D2170CB953002C3D79 /* align_center@2x.png */,
 				522C01D3170CB953002C3D79 /* align_left@2x.png */,
@@ -235,7 +244,6 @@
 			files = (
 				52F0EB23170220FE00E571C7 /* InfoPlist.strings in Resources */,
 				52372E7B170794D800B44F7C /* NewTextWindow.xib in Resources */,
-				5227FF9F170B332300501B96 /* TextFieldWindow.xib in Resources */,
 				522C01C6170CACE2002C3D79 /* align_bottom.png in Resources */,
 				522C01C7170CACE2002C3D79 /* align_center.png in Resources */,
 				522C01C8170CACE2002C3D79 /* align_left.png in Resources */,
@@ -253,6 +261,10 @@
 				522C01DC170CB953002C3D79 /* align_right@2x.png in Resources */,
 				522C01DD170CB953002C3D79 /* align_top@2x.png in Resources */,
 				522C01DE170CB953002C3D79 /* text_field@2x.png in Resources */,
+				52EA58181715BDFC005C8CCF /* AddUserTextWindow.xib in Resources */,
+				52EA581B1715C309005C8CCF /* add_item.png in Resources */,
+				52EA581C1715C309005C8CCF /* add_item@2x.png in Resources */,
+				52DAD2D017170AB00037C622 /* TextFieldWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
