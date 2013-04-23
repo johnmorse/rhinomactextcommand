@@ -13,6 +13,9 @@ namespace RhinoMac
     new public void Dispose()
     {
       ResetResponderChain();
+      if (null != _fontManager)
+        _fontManager.Dispose();
+      _fontManager = null;
       base.Dispose();
     }
     /// <summary>

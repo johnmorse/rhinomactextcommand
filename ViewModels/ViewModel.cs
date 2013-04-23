@@ -87,6 +87,46 @@ namespace Rhino.ViewModel
 
       return memberExpression.Member.Name;
     }
+    
+    protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, string newValue, ref string currentValue)
+    {
+      if (newValue == currentValue) return;
+      newValue = currentValue;
+      var propertyName = ExtractPropertyName(propertyExpression);
+      RaisePropertyChanged(propertyName);
+    }
+    
+    protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, bool newValue, ref bool currentValue)
+    {
+      if (newValue == currentValue) return;
+      newValue = currentValue;
+      var propertyName = ExtractPropertyName(propertyExpression);
+      RaisePropertyChanged(propertyName);
+    }
+    
+    protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, int newValue, ref int currentValue)
+    {
+      if (newValue == currentValue) return;
+      newValue = currentValue;
+      var propertyName = ExtractPropertyName(propertyExpression);
+      RaisePropertyChanged(propertyName);
+    }
+    
+    protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, double newValue, ref double currentValue)
+    {
+      if (newValue == currentValue) return;
+      newValue = currentValue;
+      var propertyName = ExtractPropertyName(propertyExpression);
+      RaisePropertyChanged(propertyName);
+    }
+
+    protected void SetPropertyValue<T>(Expression<Func<T>> propertyExpression, System.Drawing.Color newValue, ref System.Drawing.Color currentValue)
+    {
+      if (newValue == currentValue) return;
+      newValue = currentValue;
+      var propertyName = ExtractPropertyName(propertyExpression);
+      RaisePropertyChanged(propertyName);
+    }
 
 #if ON_OS_MAC
     public RhinoMac.Window Window { get; set; }

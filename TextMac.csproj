@@ -44,11 +44,11 @@
       <HintPath>..\..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="RhinoMac">
       <HintPath>..\..\..\..\Library\Developer\Xcode\DerivedData\MacRhino-fxswjfvtztmahtbrorxgsjkmlveu\Build\Products\Debug\Rhinoceros.app\Contents\Resources\RhinoMac.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

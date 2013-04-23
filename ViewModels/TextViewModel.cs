@@ -120,49 +120,53 @@ namespace Text
     {
       // View model to be used as the controller for the text
       // field window.
-      var viewModel = new TextFieldViewModel(Doc);
-      bool? dialogResult = null;
-      var start = -1;
-      var length = -1;
-    #if ON_OS_MAC
-      // Create a NSWindow from a Nib file
-      var window = RhinoMac.Window.FromNib("TextFieldWindow", viewModel);
-      // Display the window
-      window.ShowModal();
-      dialogResult = window.DialogResult;
-    #endif
-    #if ON_OS_WINDOWS
-      var textWindow = Window as Win.TextWindow;
-      if (null != textWindow)
+      using (var viewModel = new TextFieldViewModel(Doc))
       {
-        // Need to update the text property, it wont get updated when the
-        // fields button gets clicked so do it manually
-        text = textWindow.textBox.Text;
-        // Get the location of the cursor in the text box
-        start = textWindow.textBox.SelectionStart;
-        // Get the slected text length if something is selected
-        length = textWindow.textBox.SelectionLength;
+        bool? dialogResult = null;
+        var start = -1;
+        var length = -1;
+        #if ON_OS_MAC
+        // Create a NSWindow from a Nib file
+        using (var window = RhinoMac.Window.FromNib("TextFieldWindow", viewModel))
+        {
+          // Display the window
+          window.ParentWindow = Window;
+          window.ShowModal();
+          dialogResult = window.DialogResult;
+        }
+        #endif
+        #if ON_OS_WINDOWS
+        var textWindow = Window as Win.TextWindow;
+        if (null != textWindow)
+        {
+          // Need to update the text property, it wont get updated when the
+          // fields button gets clicked so do it manually
+          text = textWindow.textBox.Text;
+          // Get the location of the cursor in the text box
+          start = textWindow.textBox.SelectionStart;
+          // Get the slected text length if something is selected
+          length = textWindow.textBox.SelectionLength;
+        }
+        var window = new Win.TextFieldWindow();
+        window.DataContext = viewModel;
+        window.Owner = Window;
+        viewModel.Window = window;
+        window.ShowDialog();
+        dialogResult = window.DialogResult;
+        #endif
+        if (dialogResult != true)
+          return;
+        var formatString = viewModel.CalculateFinalFormatString();
+        if (string.IsNullOrEmpty(formatString))
+          return;
+        if (!string.IsNullOrEmpty(text) && start >= 0 && length >= 0)
+        {
+          var before = (start < 1 ? string.Empty : text.Substring(0, start));
+          var after = ((start + length) < text.Length) ? text.Substring(start + length) : string.Empty;
+          text = before + formatString + after;
+        } else
+          text += formatString;
       }
-      var window = new Win.TextFieldWindow();
-      window.DataContext = viewModel;
-      window.Owner = Window;
-      viewModel.Window = window;
-      window.ShowDialog();
-      dialogResult = window.DialogResult;
-    #endif
-      if (dialogResult != true)
-        return;
-      var formatString = viewModel.CalculateFinalFormatString();
-      if (string.IsNullOrEmpty(formatString))
-        return;
-      if (!string.IsNullOrEmpty(text) && start >= 0 && length >= 0)
-      {
-        var before = (start < 1 ? string.Empty : text.Substring(0, start));
-        var after = ((start + length) < text.Length) ? text.Substring(start + length) : string.Empty;
-        text = before + formatString + after;
-      }
-      else
-        text += formatString;
     }
     #endregion Methods
 
