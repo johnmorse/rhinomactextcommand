@@ -45,25 +45,25 @@ namespace Text.Commands
         m_default_entity.FontIndex = doc.Fonts.CurrentIndex;
       }
       
-      Rhino.Geometry.TextEntity current_text = m_default_entity;
-      
       var plane = doc.Views.ActiveView.ActiveViewport.ConstructionPlane();
       plane.Origin = startpoint;
-      current_text.Plane = plane;
-      var test_font = doc.Fonts[current_text.FontIndex];
+      m_default_entity.Plane = plane;
+      var test_font = doc.Fonts[m_default_entity.FontIndex];
       if (test_font == null) //can happen when a new doc is created and the saved font index is invalid
-        current_text.FontIndex = 0;
+        m_default_entity.FontIndex = 0;
 
       // View Model to associate with this instance of RunCommand, this
       // View Model is used by both the scripting and interactive versions
       // of the command.
-      var model = new TextViewModel(doc, current_text);
+      var model = new TextViewModel(doc, m_default_entity);
       // Run the scripting or GUI methods to gather data in the View Model.
       var result = (mode == RunMode.Scripted ? RunScript(model) : RunInteractive(model));
       if (result != Result.Success)
         return result;
 
-      return model.AddTextEntityToDocument();
+      result = model.AddTextEntityToDocument();
+
+      return result;
     }
     /// <summary>
     /// Called when the command is in interactive (window) mode
@@ -73,7 +73,6 @@ namespace Text.Commands
     static Result RunInteractive(TextViewModel model)
     {
       var result = Result.Cancel;
-      model.text = string.Empty;
 
       #region Mac Specific UI
       #if ON_OS_MAC

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextWin", "TextWin.csproj", "{D9F84990-787A-4B0C-BF15-90902A6C6906}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RhinoWindows", "..\rhinowindows\RhinoWindows.csproj", "{78E5C303-7764-446E-BABA-FDB410BD98E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RhinoWindows", "..\..\..\Rhino\6\trunk\src4\DotNetSDK\RhinoWindows\RhinoWindows.csproj", "{78E5C303-7764-446E-BABA-FDB410BD98E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

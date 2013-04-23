@@ -152,16 +152,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RhinoWindows\RhinoWindows.csproj">
-      <Project>{78e5c303-7764-446e-baba-fdb410bd98e1}</Project>
-      <Name>RhinoWindows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\add_item.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\add_item%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Rhino\6\trunk\src4\DotNetSDK\RhinoWindows\RhinoWindows.csproj">
+      <Project>{78e5c303-7764-446e-baba-fdb410bd98e1}</Project>
+      <Name>RhinoWindows</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

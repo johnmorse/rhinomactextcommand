@@ -17,6 +17,9 @@ namespace Text
     {
       _doc = doc;
       _textEntity = textEntity;
+      _text = textEntity.TextFormula;
+      if (string.IsNullOrWhiteSpace(_text))
+        _text = textEntity.Text;
       // Mask type combo box list
       _maskTypeList.Add(Rhino.UI.LOC.STR("None"));
       _maskTypeList.Add(Rhino.UI.LOC.STR("Background"));
@@ -75,6 +78,14 @@ namespace Text
     {
       if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(_textEntity.TextFormula))
         return Rhino.Commands.Result.Failure;
+
+      _textEntity.Text = string.Empty;
+      _textEntity.TextFormula = string.Empty;
+
+      if (_text.IndexOf("%<", System.StringComparison.Ordinal) >= 0)
+        _textEntity.TextFormula = _text;
+      else
+        _textEntity.Text = _text;
       
       Doc.Objects.AddText(_textEntity);
       Doc.Views.Redraw();
@@ -173,11 +184,11 @@ namespace Text
     /// <value>The text.</value>
     public string text
     {
-      get { return _textEntity.Text; }
+      get { return _text; }
       set
       {
-        if (value == _textEntity.Text) return;
-        _textEntity.Text = value;
+        if (value == _text) return;
+        _text = value;
         RaisePropertyChanged(() => text);
       }
     }
@@ -580,6 +591,7 @@ namespace Text
     /// </summary>
     private readonly RhinoDoc _doc;
     private Rhino.Geometry.TextEntity _textEntity;
+    private string _text = string.Empty;
     private List<string> _maskTypeList = new List<string>();
     #endregion Private members
   }
