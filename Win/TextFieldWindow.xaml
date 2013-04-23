@@ -19,6 +19,10 @@
         <Style TargetType="GroupBox" x:Key="DescriptionGroupBoxStyle">
             <Setter Property="Margin" Value="3"/>
         </Style>
+        <Style TargetType="TabItem" x:Key="TabItemStyle">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
     </Window.Resources>
     <Grid Margin="3">
         <Grid.RowDefinitions>
@@ -27,9 +31,10 @@
         </Grid.RowDefinitions>
             <TabControl Margin="3"
                         TabStripPlacement="Left"
+                        HorizontalContentAlignment="Left"
                         SelectedIndex="{Binding Path=selectedFieldIndex}"
                         >
-            <TabItem Header="Area">
+            <TabItem Header="Area" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -41,7 +46,7 @@
                     <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="BlockInstanceCount">
+            <TabItem Header="BlockInstanceCount" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -68,7 +73,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="2" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="CurveLength">
+            <TabItem Header="CurveLength" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -80,7 +85,7 @@
                     <myWPF:TextFieldSelectObjectUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Date">
+            <TabItem Header="Date" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -92,7 +97,7 @@
                     <myWPF:TextFieldDateUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="DateModified">
+            <TabItem Header="DateModified" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -104,7 +109,7 @@
                     <myWPF:TextFieldDateUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="DocumentText">
+            <TabItem Header="DocumentText" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -116,7 +121,7 @@
                     <myWPF:TextFieldKeyValueListUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="FileName">
+            <TabItem Header="FileName" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -138,7 +143,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="3" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="ModelUnits">
+            <TabItem Header="ModelUnits" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -150,7 +155,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Notes">
+            <TabItem Header="Notes" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -168,7 +173,7 @@
                              />
                 </Grid>
             </TabItem>
-            <TabItem Header="NumPages">
+            <TabItem Header="NumPages" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -180,7 +185,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="ObjectName">
+            <TabItem Header="ObjectName" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -192,7 +197,7 @@
                     <myWPF:TextFieldSelectObjectUC Grid.Row ="1"  Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="PageName">
+            <TabItem Header="PageName" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -204,7 +209,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="PageNumber">
+            <TabItem Header="PageNumber" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -216,7 +221,7 @@
                     <myWPF:TextFieldEvaluatedValueUC Grid.Row ="1" Margin="3,0"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="UserText">
+            <TabItem Header="UserText" Style="{StaticResource TabItemStyle}">
                 <Grid Style="{StaticResource TabItemGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
