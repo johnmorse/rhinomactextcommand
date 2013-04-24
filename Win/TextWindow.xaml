@@ -158,11 +158,13 @@
                  Grid.ColumnSpan="3"
                  AcceptsReturn="True"
                  AcceptsTab="True"
-                 TextWrapping="Wrap"
                  TextAlignment="{Binding Path=TextAlignment}"
                  Text="{Binding Path=text}"
                  FontWeight="{Binding Path=FontWeight}"
                  FontStyle="{Binding Path=FontStyle}"
+                 IsInactiveSelectionHighlightEnabled="True"
+                 HorizontalScrollBarVisibility="Auto"
+                 VerticalScrollBarVisibility="Auto"
                  />
 
         <Grid Grid.Row="7" Grid.ColumnSpan="3" Margin="0">
@@ -190,7 +192,8 @@
                     VerticalAlignment="Center" Click="ButtonClickCancel"
                 />
         </Grid>
-        <ToolBar Grid.Row="5"
+        <ToolBar Name="toolBarControl"
+                 Grid.Row="5"
                  Grid.ColumnSpan="3"
                  Margin="3"
                  Background="{x:Static SystemColors.WindowBrush}"
@@ -202,33 +205,39 @@
             <CheckBox IsChecked="{Binding Path=italic}">
                 <Image Source="/Text;component/Resources/italic.png" />
             </CheckBox>
-            <Separator/>
-            <RadioButton GroupName="horizontalGroup"
+            <Separator />
+            <RadioButton 
+                         GroupName="horizontalGroup"
                          IsChecked="{Binding Path=alignLeftChecked}">
                 <Image Source="/Text;component/Resources/align_left.png" />
             </RadioButton>
-            <RadioButton GroupName="horizontalGroup"
+            <RadioButton 
+                         GroupName="horizontalGroup"
                          IsChecked="{Binding Path=alignCenterChecked}">
                 <Image Source="/Text;component/Resources/align_center.png" />
             </RadioButton>
-            <RadioButton GroupName="horizontalGroup"
+            <RadioButton 
+                         GroupName="horizontalGroup"
                          IsChecked="{Binding Path=alignRightChecked}">
                 <Image Source="/Text;component/Resources/align_right.png" />
             </RadioButton>
-            <Separator/>
-            <RadioButton GroupName="verticalGroup"
+            <Separator />
+            <RadioButton 
+                         GroupName="verticalGroup"
                          IsChecked="{Binding Path=alignTopChecked}">
                 <Image Source="/Text;component/Resources/align_top.png" />
             </RadioButton>
-            <RadioButton GroupName="verticalGroup"
+            <RadioButton 
+                         GroupName="verticalGroup"
                          IsChecked="{Binding Path=alignMidChecked}">
                 <Image Source="/Text;component/Resources/align_middle.png" />
             </RadioButton>
-            <RadioButton GroupName="verticalGroup"
+            <RadioButton 
+                         GroupName="verticalGroup"
                          IsChecked="{Binding Path=alignBottomChecked}">
                 <Image Source="/Text;component/Resources/align_bottom.png" />
             </RadioButton>
-            <Separator/>
+            <Separator />
             <Button Command="{Binding Path=ShowTextFieldsFormCommand}">
                 <Image Source="/Text;component/Resources/text_field.png" />
             </Button>
