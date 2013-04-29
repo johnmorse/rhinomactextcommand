@@ -94,6 +94,7 @@ namespace Text.Commands
 
       #if ON_OS_WINDOWS
       var window = new Win.TextWindow();
+      window.Loaded += window_Loaded;
       window.DataContext = model;
       // Need to save the window so it can be used as the
       // parent for the color dialog.
@@ -111,6 +112,24 @@ namespace Text.Commands
 
       return result;
     }
+
+#if ON_OS_WINDOWS
+    /// <summary>
+    /// Remove the overflow control from the far right side of the tool bar.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    static void window_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+      var window = sender as Win.TextWindow;
+      if (null == window) return;
+      foreach (System.Windows.FrameworkElement item in window.toolBarControl.Items)
+        System.Windows.Controls.ToolBar.SetOverflowMode(item, System.Windows.Controls.OverflowMode.Never);
+      var overflowGrid = window.toolBarControl.Template.FindName("OverflowGrid", window.toolBarControl) as System.Windows.FrameworkElement;
+      if (overflowGrid == null) return;
+      overflowGrid.Visibility = System.Windows.Visibility.Collapsed;
+    }
+#endif
     /// <summary>
     /// Called when the command is in scripted mode
     /// </summary>

@@ -28,6 +28,7 @@ namespace Text
       ShowMaskColorDialogCommand = new RhinoWindows.Input.DelegateCommand(ShowMaskColorDialog, null);
       ShowSelectTextFontCommand = new RhinoWindows.Input.DelegateCommand(ShowSelectTextFont, null);
       ShowTextFieldsFormCommand = new RhinoWindows.Input.DelegateCommand(ShowTextFieldsForm, null);
+      ImportTextFileCommand = new RhinoWindows.Input.DelegateCommand(ImportTextFile, null);
 #endif
     }
 
@@ -134,8 +135,6 @@ namespace Text
       using (var viewModel = new TextFieldViewModel(Doc))
       {
         bool? dialogResult = null;
-        var start = -1;
-        var length = -1;
         #if ON_OS_MAC
         // Create a NSWindow from a Nib file
         using (var window = RhinoMac.Window.FromNib("TextFieldWindow", viewModel))
@@ -147,17 +146,6 @@ namespace Text
         }
         #endif
         #if ON_OS_WINDOWS
-        var textWindow = Window as Win.TextWindow;
-        if (null != textWindow)
-        {
-          // Need to update the text property, it wont get updated when the
-          // fields button gets clicked so do it manually
-          text = textWindow.textBox.Text;
-          // Get the location of the cursor in the text box
-          start = textWindow.textBox.SelectionStart;
-          // Get the slected text length if something is selected
-          length = textWindow.textBox.SelectionLength;
-        }
         var window = new Win.TextFieldWindow();
         window.DataContext = viewModel;
         window.Owner = Window;
@@ -168,16 +156,74 @@ namespace Text
         if (dialogResult != true)
           return;
         var formatString = viewModel.CalculateFinalFormatString();
-        if (string.IsNullOrEmpty(formatString))
-          return;
-        if (!string.IsNullOrEmpty(text) && start >= 0 && length >= 0)
-        {
-          var before = (start < 1 ? string.Empty : text.Substring(0, start));
-          var after = ((start + length) < text.Length) ? text.Substring(start + length) : string.Empty;
-          text = before + formatString + after;
-        } else
-          text += formatString;
+        InsertText(formatString);
       }
+    }
+    /// <summary>
+    /// Display the file open dialog prompting for a text file to insert and
+    /// insert the file contents into the existing text string.
+    /// </summary>
+    public void ImportTextFile()
+    {
+      var fileName = string.Empty;
+      #if ON_OS_MAC
+      using (var panel = new MonoMac.AppKit.NSOpenPanel())
+      {
+        panel.CanChooseFiles = true;
+        panel.CanChooseDirectories = false;
+        var rc = panel.RunModal ();
+        if (rc < 1)
+          return;
+        var urls = panel.Urls;
+        if (null == urls || urls.Length < 1)
+          return;
+        fileName = urls [0].Path;
+      }
+      #endif
+      #if ON_OS_WINDOWS
+      var dlg = new Microsoft.Win32.OpenFileDialog();
+      dlg.Filter = Rhino.UI.LOC.STR("Text files (*.txt)|*.txt|All files (*.*)|*.*");
+      if (true == dlg.ShowDialog(Window))
+        fileName = dlg.FileName;
+      #endif
+      if (string.IsNullOrWhiteSpace(fileName)) return;
+      var fileContents = System.IO.File.ReadAllText(fileName);
+      InsertText(fileContents);
+    }
+    /// <summary>
+    /// Insert text format string or file contents or some other string value
+    /// into the existing text string.  In Windows this will attempt to insert
+    /// the new text string into the current selection/location, on Mac it
+    /// just appends the new text to the end of the existing text.
+    /// </summary>
+    /// <param name="s"></param>
+    void InsertText(string s)
+    {
+      if (string.IsNullOrEmpty(s))
+        return;
+      var start = -1;
+      var length = -1;
+#if ON_OS_WINDOWS
+      var textWindow = Window as Win.TextWindow;
+      if (null != textWindow)
+      {
+        // Need to update the text property, it wont get updated when the
+        // fields button gets clicked so do it manually
+        text = textWindow.textBox.Text;
+        // Get the location of the cursor in the text box
+        start = textWindow.textBox.SelectionStart;
+        // Get the slected text length if something is selected
+        length = textWindow.textBox.SelectionLength;
+      }
+#endif
+      if (!string.IsNullOrEmpty(text) && start >= 0 && length >= 0)
+      {
+        var before = (start < 1 ? string.Empty : text.Substring(0, start));
+        var after = ((start + length) < text.Length) ? text.Substring(start + length) : string.Empty;
+        text = before + s + after;
+      }
+      else
+        text += s;
     }
     #endregion Methods
 
@@ -495,6 +541,7 @@ namespace Text
     public System.Windows.Input.ICommand ShowMaskColorDialogCommand { get; private set; }
     public System.Windows.Input.ICommand ShowSelectTextFontCommand { get; private set; }
     public System.Windows.Input.ICommand ShowTextFieldsFormCommand { get; private set; }
+    public System.Windows.Input.ICommand ImportTextFileCommand { get; private set; }
     #endif
     #endregion Windows specific command helpers
 

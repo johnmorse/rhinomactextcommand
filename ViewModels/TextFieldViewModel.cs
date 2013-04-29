@@ -1397,7 +1397,7 @@ namespace Text
     [MonoMac.Foundation.Export ("localName")]
 #endif
     public string LocalName { get { return m_local_name; } }
-    public override string Description { get { return m_description; } }
+    public string Description { get { return m_description; } }
     public override string ToString()
     {
       return LocalName;

@@ -161,8 +161,12 @@
     <ProjectReference Include="..\..\..\Rhino\6\trunk\src4\DotNetSDK\RhinoWindows\RhinoWindows.csproj">
       <Project>{78e5c303-7764-446e-baba-fdb410bd98e1}</Project>
       <Name>RhinoWindows</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FileOpen%402x.png" />
+    <Resource Include="Resources\FileOpen.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

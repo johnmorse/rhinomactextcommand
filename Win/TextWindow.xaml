@@ -241,6 +241,9 @@
             <Button Command="{Binding Path=ShowTextFieldsFormCommand}">
                 <Image Source="/Text;component/Resources/text_field.png" />
             </Button>
+            <Button Command="{Binding Path=ImportTextFileCommand}">
+                <Image Source="/Text;component/Resources/FileOpen.png" />
+            </Button>
         </ToolBar>
     </Grid>
 </Window>
