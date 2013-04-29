@@ -65,6 +65,96 @@ namespace Text.Commands
 
       return result;
     }
+    public class MyNib : MonoMac.AppKit.NSNib
+    {
+      public MyNib(string nibName, MonoMac.Foundation.NSBundle bundle) : base(nibName, bundle)
+      {
+
+      }
+      public override MonoMac.Foundation.NSObject ValueForKey(MonoMac.Foundation.NSString key)
+      {
+        return base.ValueForKey(key);
+      }
+      public override MonoMac.Foundation.NSObject ValueForKeyPath(MonoMac.Foundation.NSString keyPath)
+      {
+        return base.ValueForKeyPath(keyPath);
+      }
+      public override void Bind(string binding, MonoMac.Foundation.NSObject observable, string keyPath, MonoMac.Foundation.NSDictionary options)
+      {
+        base.Bind(binding, observable, keyPath, options);
+      }
+    }
+    public class MyWindowController : MonoMac.AppKit.NSWindowController
+    {
+      public MyWindowController (string nibName, MonoMac.Foundation.NSBundle bundle) : base (nibName)
+      {
+        //MonoMac.AppKit.NSWindowDelegate
+        _bundle = bundle;
+        // /Users/john/dev/rhino/src4/rhino4/MacOS/MonoMac/monomac/src/AppKit/NSNib.g.cs
+      }
+      public override void LoadWindow()
+      {
+        //base.LoadWindow();
+        _nib = new MyNib(WindowNibName, _bundle);
+        _dictionary = new MonoMac.Foundation.NSDictionary();
+        _nib.InstantiateNib(_dictionary);
+      }
+
+      public override void WindowWillLoad()
+      {
+        base.WindowWillLoad();
+      }
+      public override void WindowDidLoad()
+      {
+        base.WindowDidLoad();
+      }
+      public override void Bind(string binding, MonoMac.Foundation.NSObject observable, string keyPath, MonoMac.Foundation.NSDictionary options)
+      {
+        base.Bind(binding, observable, keyPath, options);
+      }
+      public override MonoMac.Foundation.NSObject ValueForKey(MonoMac.Foundation.NSString key)
+      {
+        return base.ValueForKey(key);
+      }
+      public override MonoMac.Foundation.NSObject ValueForKeyPath(MonoMac.Foundation.NSString keyPath)
+      {
+        return base.ValueForKeyPath(keyPath);
+      }
+      public override MonoMac.Foundation.NSObject ValueForUndefinedKey(MonoMac.Foundation.NSString key)
+      {
+        return base.ValueForUndefinedKey(key);
+      }
+
+      MonoMac.Foundation.NSBundle _bundle;
+      MonoMac.AppKit.NSNib _nib;
+      MonoMac.Foundation.NSDictionary _dictionary;
+    }
+    static MyWindowController TestMonoCreateWindow(TextViewModel model)
+    {
+      MyWindowController result = null;
+      try
+      {
+        // Playing with creating Window and controller using MonoMac and not Marlin
+        //result = new MonoMac.AppKit.NSWindowController("NewTextWindow");
+        //result.LoadWindow();
+        var location = typeof(MyWindowController).Assembly.Location;
+        var index = location.IndexOf(".rhp");
+        var path = location.Substring(0, index < 0 ? location.Length : index + 4);
+        var bundle = MonoMac.Foundation.NSBundle.FromPath(path);
+        if (null == bundle)
+          return null;
+        result = new MyWindowController("NewTextWindow", bundle);
+        var window = result.Window; // Forces the window to get created
+      }
+      catch (System.Exception exception)
+      {
+        if (null != result)
+          result.Dispose();
+        result = null;
+        Rhino.Runtime.HostUtils.ExceptionReport(exception);
+      }
+      return result;
+    }
     /// <summary>
     /// Called when the command is in interactive (window) mode
     /// </summary>
@@ -72,6 +162,8 @@ namespace Text.Commands
     /// <returns></returns>
     static Result RunInteractive(TextViewModel model)
     {
+      using (var test = TestMonoCreateWindow(model))
+        Rhino.RhinoApp.WriteLine("Test create window from nib");
       var result = Result.Cancel;
 
       #region Mac Specific UI

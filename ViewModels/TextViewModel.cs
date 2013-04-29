@@ -79,15 +79,10 @@ namespace Text
     {
       if (string.IsNullOrWhiteSpace(text) && string.IsNullOrWhiteSpace(_textEntity.TextFormula))
         return Rhino.Commands.Result.Failure;
-
-      _textEntity.Text = string.Empty;
-      _textEntity.TextFormula = string.Empty;
-
       if (_text.IndexOf("%<", System.StringComparison.Ordinal) >= 0)
         _textEntity.TextFormula = _text;
       else
         _textEntity.Text = _text;
-      
       Doc.Objects.AddText(_textEntity);
       Doc.Views.Redraw();
       return Rhino.Commands.Result.Success;

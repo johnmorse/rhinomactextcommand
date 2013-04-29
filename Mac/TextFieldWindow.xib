@@ -631,7 +631,7 @@
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="267846838">
-													<int key="NSCellFlags">-2073034687</int>
+													<int key="NSCellFlags">-1804599231</int>
 													<int key="NSCellFlags2">272630848</int>
 													<string key="NSContents"/>
 													<reference key="NSSupport" ref="708152427"/>
@@ -745,7 +745,7 @@
 														<int key="NSvFlags">-2147483392</int>
 														<string key="NSFrame">{{1, 148}, {0, 15}}</string>
 														<reference key="NSSuperview" ref="190663079"/>
-														<reference key="NSNextKeyView" ref="862989096"/>
+														<reference key="NSNextKeyView" ref="313879738"/>
 														<string key="NSReuseIdentifierKey">_NS:60</string>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<int key="NSsFlags">1</int>
@@ -809,7 +809,7 @@
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="515408336">
-													<int key="NSCellFlags">-2073034687</int>
+													<int key="NSCellFlags">-1804599231</int>
 													<int key="NSCellFlags2">272630848</int>
 													<string key="NSContents"/>
 													<reference key="NSSupport" ref="708152427"/>
@@ -918,7 +918,6 @@
 														<int key="NSvFlags">-2147483392</int>
 														<string key="NSFrame">{{1, 148}, {0, 15}}</string>
 														<reference key="NSSuperview" ref="967430543"/>
-														<reference key="NSNextKeyView" ref="862989096"/>
 														<string key="NSReuseIdentifierKey">_NS:60</string>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<int key="NSsFlags">1</int>
@@ -1015,7 +1014,6 @@
 																		</object>
 																		<int key="NSResizingMask">3</int>
 																		<bool key="NSIsResizeable">YES</bool>
-																		<bool key="NSIsEditable">YES</bool>
 																		<reference key="NSTableView" ref="147075332"/>
 																	</object>
 																	<object class="NSTableColumn" id="218818839">
@@ -1041,7 +1039,6 @@
 																		</object>
 																		<int key="NSResizingMask">3</int>
 																		<bool key="NSIsResizeable">YES</bool>
-																		<bool key="NSIsEditable">YES</bool>
 																		<reference key="NSTableView" ref="147075332"/>
 																	</object>
 																</array>
@@ -1799,7 +1796,6 @@ wGw</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{17, 76}, {372, 100}}</string>
 												<reference key="NSSuperview" ref="1034844245"/>
-												<reference key="NSNextKeyView" ref="862989096"/>
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<string key="NSAntiCompressionPriority">{250, 750}</string>
 												<bool key="NSEnabled">YES</bool>
@@ -1855,7 +1851,6 @@ wGw</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{17, 76}, {372, 100}}</string>
 												<reference key="NSSuperview" ref="987938901"/>
-												<reference key="NSNextKeyView" ref="862989096"/>
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<string key="NSAntiCompressionPriority">{250, 750}</string>
 												<bool key="NSEnabled">YES</bool>
@@ -1997,7 +1992,6 @@ wGw</bytes>
 																		</object>
 																		<int key="NSResizingMask">3</int>
 																		<bool key="NSIsResizeable">YES</bool>
-																		<bool key="NSIsEditable">YES</bool>
 																		<reference key="NSTableView" ref="143124268"/>
 																	</object>
 																	<object class="NSTableColumn" id="121862301">
@@ -2023,7 +2017,6 @@ wGw</bytes>
 																		</object>
 																		<int key="NSResizingMask">3</int>
 																		<bool key="NSIsResizeable">YES</bool>
-																		<bool key="NSIsEditable">YES</bool>
 																		<reference key="NSTableView" ref="143124268"/>
 																	</object>
 																</array>
@@ -2802,19 +2795,19 @@ wGw</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: enableUserTextFieldCollection</string>
-						<reference key="source" ref="143124268"/>
+						<string key="label">hidden: hideUserTextFieldCollection</string>
+						<reference key="source" ref="838279590"/>
 						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="143124268"/>
+							<reference key="NSSource" ref="838279590"/>
 							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">enabled: enableUserTextFieldCollection</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">enableUserTextFieldCollection</string>
+							<string key="NSLabel">hidden: hideUserTextFieldCollection</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">hideUserTextFieldCollection</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">2558</int>
+					<int key="connectionID">2577</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -3018,35 +3011,19 @@ wGw</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: enableUserTextFieldCollection</string>
+						<string key="label">hidden: hideUserTextFieldCollection</string>
 						<reference key="source" ref="219164286"/>
 						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="219164286"/>
 							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">enabled: enableUserTextFieldCollection</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">enableUserTextFieldCollection</string>
+							<string key="NSLabel">hidden: hideUserTextFieldCollection</string>
+							<string key="NSBinding">hidden</string>
+							<string key="NSKeyPath">hideUserTextFieldCollection</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">2560</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: enableUserTextFieldCollection</string>
-						<reference key="source" ref="232885960"/>
-						<reference key="destination" ref="1001"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="232885960"/>
-							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">enabled: enableUserTextFieldCollection</string>
-							<string key="NSBinding">enabled</string>
-							<string key="NSKeyPath">enableUserTextFieldCollection</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">2564</int>
+					<int key="connectionID">2579</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -7814,7 +7791,7 @@ wGw</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">2569</int>
+			<int key="maxID">2579</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
